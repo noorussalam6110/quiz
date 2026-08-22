@@ -250,9 +250,7 @@
             -webkit-tap-highlight-color: transparent;
             font-family: 'Anek Malayalam', sans-serif;
         }
-        .option-btn:active:not(.selected):not(:disabled) {
-            transform: scale(0.95);
-        }
+        .option-btn:active:not(.selected):not(:disabled) { transform: scale(0.95); }
         .option-btn.selected {
             border-color: #facc15;
             background: rgba(250, 204, 21, 0.15);
@@ -268,34 +266,32 @@
 
         /* Blink animations */
         @keyframes blinkGreen {
-            0% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
-            25% { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 10px #22c55e; }
-            50% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
-            75% { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 10px #22c55e; }
-            100% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
+            0% { border-color: #22c55e; background: rgba(34,197,94,0.3); box-shadow: 0 0 40px #22c55e; }
+            25% { border-color: #22c55e; background: rgba(34,197,94,0.05); box-shadow: 0 0 10px #22c55e; }
+            50% { border-color: #22c55e; background: rgba(34,197,94,0.3); box-shadow: 0 0 40px #22c55e; }
+            75% { border-color: #22c55e; background: rgba(34,197,94,0.05); box-shadow: 0 0 10px #22c55e; }
+            100% { border-color: #22c55e; background: rgba(34,197,94,0.3); box-shadow: 0 0 40px #22c55e; }
         }
         @keyframes blinkRed {
-            0% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
-            25% { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); box-shadow: 0 0 10px #ef4444; }
-            50% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
-            75% { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); box-shadow: 0 0 10px #ef4444; }
-            100% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
+            0% { border-color: #ef4444; background: rgba(239,68,68,0.3); box-shadow: 0 0 40px #ef4444; }
+            25% { border-color: #ef4444; background: rgba(239,68,68,0.05); box-shadow: 0 0 10px #ef4444; }
+            50% { border-color: #ef4444; background: rgba(239,68,68,0.3); box-shadow: 0 0 40px #ef4444; }
+            75% { border-color: #ef4444; background: rgba(239,68,68,0.05); box-shadow: 0 0 10px #ef4444; }
+            100% { border-color: #ef4444; background: rgba(239,68,68,0.3); box-shadow: 0 0 40px #ef4444; }
         }
         .option-btn.blink-green {
             animation: blinkGreen 0.8s ease 4;
             border-color: #22c55e !important;
-            background: rgba(34, 197, 94, 0.3) !important;
+            background: rgba(34,197,94,0.3) !important;
             box-shadow: 0 0 40px #22c55e !important;
         }
         .option-btn.blink-red {
             animation: blinkRed 0.8s ease 4;
             border-color: #ef4444 !important;
-            background: rgba(239, 68, 68, 0.3) !important;
+            background: rgba(239,68,68,0.3) !important;
             box-shadow: 0 0 40px #ef4444 !important;
         }
-        .option-btn.blink-green, .option-btn.blink-red {
-            cursor: default;
-        }
+        .option-btn.blink-green, .option-btn.blink-red { cursor: default; }
 
         .lock-area {
             display: flex;
@@ -349,7 +345,7 @@
         .status-msg.error { color: #f87171; }
 
         /* ============================================================ */
-        /* ADMIN VIEW – Kahoot‑Style Projector (Toggleable Views) */
+        /* ADMIN VIEW (with all controls) */
         /* ============================================================ */
         #adminView {
             display: none;
@@ -391,14 +387,13 @@
             margin-top: 2px;
         }
 
-        /* --- Display Area (shared) --- */
         .admin-display-area {
             flex: 1;
             overflow-y: auto;
             padding: 10px 0;
         }
 
-        /* ---- View 1: Group View (columns) ---- */
+        /* Group View */
         .projector-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -419,9 +414,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .option-column:hover {
-            background: rgba(30, 41, 59, 0.6);
-        }
+        .option-column:hover { background: rgba(30, 41, 59, 0.6); }
         .option-column .col-header {
             font-size: 3rem;
             font-weight: 800;
@@ -474,21 +467,15 @@
         .option-column.col-D { border-top: 6px solid #ef4444; }
         .option-column.correct-option {
             border: 4px solid #facc15;
-            box-shadow: 0 0 40px rgba(250, 204, 21, 0.3);
-            background: rgba(250, 204, 21, 0.05);
+            box-shadow: 0 0 40px rgba(250,204,21,0.3);
+            background: rgba(250,204,21,0.05);
         }
         .option-column.correct-option .col-header {
-            box-shadow: 0 0 60px rgba(250, 204, 21, 0.5);
+            box-shadow: 0 0 60px rgba(250,204,21,0.5);
         }
-        .empty-col {
-            color: #475569;
-            font-size: 0.9rem;
-            padding: 20px;
-            text-align: center;
-            font-style: italic;
-        }
+        .empty-col { color: #475569; font-size: 0.9rem; padding: 20px; text-align: center; font-style: italic; }
 
-        /* ---- View 2: Player List View (each person individually) ---- */
+        /* Player List View */
         .player-list-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -513,54 +500,20 @@
             0% { opacity: 0; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1); }
         }
-        .player-list-card .pl-name {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 6px;
-            word-break: break-word;
-        }
-        .player-list-card .pl-option {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #facc15;
-            text-shadow: 0 0 30px rgba(250, 204, 21, 0.2);
-            line-height: 1;
-            min-height: 5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .player-list-card .pl-time {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
-        /* Option-specific colors for list cards */
+        .player-list-card .pl-name { font-size: 1.4rem; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; word-break: break-word; }
+        .player-list-card .pl-option { font-size: 4rem; font-weight: 800; color: #facc15; text-shadow: 0 0 30px rgba(250,204,21,0.2); line-height: 1; min-height: 5rem; display: flex; justify-content: center; align-items: center; }
         .player-list-card .pl-option.opt-A { color: #22c55e; text-shadow: 0 0 30px rgba(34,197,94,0.3); }
         .player-list-card .pl-option.opt-B { color: #3b82f6; text-shadow: 0 0 30px rgba(59,130,246,0.3); }
         .player-list-card .pl-option.opt-C { color: #eab308; text-shadow: 0 0 30px rgba(234,179,8,0.3); }
         .player-list-card .pl-option.opt-D { color: #ef4444; text-shadow: 0 0 30px rgba(239,68,68,0.3); }
-        /* Correct/Wrong states in list view */
-        .player-list-card.card-correct {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.08);
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.1);
-        }
-        .player-list-card.card-wrong {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.08);
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.1);
-        }
-        .player-list-card .pl-status {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 4px;
-        }
+        .player-list-card .pl-time { font-size: 0.7rem; color: #64748b; margin-top: 4px; }
+        .player-list-card.card-correct { border-color: #22c55e; background: rgba(34,197,94,0.08); box-shadow: 0 0 30px rgba(34,197,94,0.1); }
+        .player-list-card.card-wrong { border-color: #ef4444; background: rgba(239,68,68,0.08); box-shadow: 0 0 30px rgba(239,68,68,0.1); }
+        .player-list-card .pl-status { font-size: 0.8rem; font-weight: 600; margin-top: 4px; }
         .player-list-card .pl-status.status-correct { color: #22c55e; }
         .player-list-card .pl-status.status-wrong { color: #ef4444; }
 
-        /* ---- Admin Controls ---- */
+        /* Admin controls */
         .admin-actions {
             display: flex;
             gap: 12px;
@@ -582,78 +535,149 @@
             backdrop-filter: blur(4px);
             text-align: center;
         }
-        .admin-actions .btn-danger { background: #dc2626; color: white; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.2); }
+        .admin-actions .btn-danger { background: #dc2626; color: white; box-shadow: 0 4px 20px rgba(220,38,38,0.2); }
         .admin-actions .btn-danger:hover { transform: scale(1.02); background: #b91c1c; }
-        .admin-actions .btn-warning { background: #f59e0b; color: #0a0e1a; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2); }
+        .admin-actions .btn-warning { background: #f59e0b; color: #0a0e1a; box-shadow: 0 4px 20px rgba(245,158,11,0.2); }
         .admin-actions .btn-warning:hover { transform: scale(1.02); background: #d97706; }
-        .admin-actions .btn-secondary { background: rgba(71, 85, 105, 0.5); color: #e2e8f0; box-shadow: 0 4px 20px rgba(71, 85, 105, 0.1); }
-        .admin-actions .btn-secondary:hover { transform: scale(1.02); background: rgba(71, 85, 105, 0.7); }
-        .admin-actions .btn-clear-correct {
-            background: rgba(139, 92, 246, 0.4);
-            color: #c4b5fd;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
-        }
-        .admin-actions .btn-clear-correct:hover { transform: scale(1.02); background: rgba(139, 92, 246, 0.6); }
-        .admin-actions .btn-toggle-view {
-            background: rgba(52, 211, 153, 0.3);
-            color: #6ee7b7;
-            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.1);
-        }
-        .admin-actions .btn-toggle-view:hover { transform: scale(1.02); background: rgba(52, 211, 153, 0.5); }
+        .admin-actions .btn-secondary { background: rgba(71,85,105,0.5); color: #e2e8f0; box-shadow: 0 4px 20px rgba(71,85,105,0.1); }
+        .admin-actions .btn-secondary:hover { transform: scale(1.02); background: rgba(71,85,105,0.7); }
+        .admin-actions .btn-clear-correct { background: rgba(139,92,246,0.4); color: #c4b5fd; box-shadow: 0 4px 20px rgba(139,92,246,0.1); }
+        .admin-actions .btn-clear-correct:hover { transform: scale(1.02); background: rgba(139,92,246,0.6); }
+        .admin-actions .btn-toggle-view { background: rgba(52,211,153,0.3); color: #6ee7b7; box-shadow: 0 4px 20px rgba(52,211,153,0.1); }
+        .admin-actions .btn-toggle-view:hover { transform: scale(1.02); background: rgba(52,211,153,0.5); }
+        .admin-actions .btn-projector { background: rgba(234,179,8,0.3); color: #fcd34d; box-shadow: 0 4px 20px rgba(234,179,8,0.1); }
+        .admin-actions .btn-projector:hover { transform: scale(1.02); background: rgba(234,179,8,0.5); }
 
-        /* ----- Lock Notification (Admin) ----- */
-        .lock-notification {
+        /* ============================================================ */
+        /* PROJECTOR OVERLAY – Clean, button‑free big screen */
+        /* ============================================================ */
+        .projector-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.88);
-            backdrop-filter: blur(20px);
+            background: #0a0e1a;
+            background-image: 
+                radial-gradient(ellipse at 50% 80%, rgba(250,204,21,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 20%, rgba(74,222,128,0.04) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
+            z-index: 9999;
             display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .projector-overlay.active { display: flex; }
+
+        .projector-header {
+            text-align: center;
+            padding: 10px 0 20px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .projector-header h1 {
+            color: #facc15;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 40px rgba(250,204,21,0.15);
+        }
+        .projector-header .sub {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        .projector-stats {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+        .projector-stats .stat-item {
+            color: #f1f5f9;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+        .projector-stats .stat-item span {
+            color: #facc15;
+            font-weight: 700;
+        }
+
+        .projector-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        /* Projector uses same grid/list styles as admin, but with larger fonts */
+        .projector-body .projector-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            padding: 10px;
+        }
+        .projector-body .option-column {
+            min-height: 250px;
+            border-radius: 40px;
+            padding: 20px 15px;
+        }
+        .projector-body .option-column .col-header {
+            width: 100px;
+            height: 100px;
+            font-size: 4.5rem;
+        }
+        .projector-body .option-column .col-count {
+            font-size: 1.6rem;
+        }
+        .projector-body .option-column .player-name {
+            font-size: 1.6rem;
+            padding: 6px 18px;
+        }
+
+        .projector-body .player-list-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .projector-body .player-list-card {
+            padding: 28px 20px;
+            border-radius: 30px;
+        }
+        .projector-body .player-list-card .pl-name {
+            font-size: 2rem;
+        }
+        .projector-body .player-list-card .pl-option {
+            font-size: 5.5rem;
+            min-height: 7rem;
+        }
+        .projector-body .player-list-card .pl-time {
+            font-size: 0.9rem;
+        }
+
+        .projector-exit {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: rgba(30,41,59,0.6);
+            border: 1px solid rgba(51,65,85,0.3);
+            color: #94a3b8;
+            font-size: 1.6rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            z-index: 9998;
-            animation: notifFadeIn 0.35s ease;
-            padding: 30px;
-            text-align: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-family: 'Anek Malayalam', sans-serif;
         }
-        .lock-notification.active { display: flex; }
-        @keyframes notifFadeIn {
-            0% { opacity: 0; transform: scale(0.96); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .lock-notification .lock-name {
-            font-size: 5rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 10px;
-            animation: nameSlide 0.5s ease 0.15s both;
-        }
-        .lock-notification .lock-option {
-            font-size: 8rem;
-            font-weight: 800;
-            color: #facc15;
-            text-shadow: 0 0 60px rgba(250, 204, 21, 0.3);
-            line-height: 1;
-            animation: rankPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes nameSlide {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes rankPop {
-            0% { transform: scale(0.3); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .lock-notification .lock-label {
-            font-size: 1.5rem;
-            color: #94a3b8;
-            font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            animation: nameSlide 0.5s ease 0.3s both;
+        .projector-exit:hover {
+            background: rgba(239,68,68,0.2);
+            color: #f87171;
+            border-color: #f8717150;
+            transform: scale(1.05);
         }
 
         /* ----- Password Modal ----- */
@@ -668,14 +692,14 @@
         }
         #passwordModal.active { display: flex; }
         .modal-box {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30,41,59,0.8);
             backdrop-filter: blur(16px);
             padding: 32px 28px;
             border-radius: 28px;
             width: 90%;
             max-width: 360px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            border: 1px solid rgba(51, 65, 85, 0.4);
+            border: 1px solid rgba(51,65,85,0.4);
         }
         .modal-box h2 { color: #facc15; margin-bottom: 4px; font-weight: 600; }
         .modal-box p { color: #94a3b8; margin-bottom: 20px; font-size: 0.85rem; }
@@ -683,8 +707,8 @@
             width: 100%;
             padding: 14px 18px;
             border-radius: 14px;
-            border: 2px solid rgba(51, 65, 85, 0.4);
-            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(51,65,85,0.4);
+            background: rgba(15,23,42,0.6);
             color: white;
             font-size: 1rem;
             margin-bottom: 16px;
@@ -716,14 +740,30 @@
 
         .admin-toggle.mobile-hidden { display: none !important; }
 
+        /* Scrollbars */
+        .admin-display-area::-webkit-scrollbar,
+        .projector-body::-webkit-scrollbar { width: 4px; }
+        .admin-display-area::-webkit-scrollbar-thumb,
+        .projector-body::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.5); border-radius: 10px; }
+        .admin-display-area::-webkit-scrollbar-track,
+        .projector-body::-webkit-scrollbar-track { background: transparent; }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .projector-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 5px; }
+            .projector-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
             .option-column .col-header { width: 50px; height: 50px; font-size: 2rem; }
             .option-column .player-name { font-size: 0.9rem; }
-            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); }
             .player-list-card .pl-option { font-size: 3rem; }
             .player-list-card .pl-name { font-size: 1.1rem; }
+            .projector-body .projector-grid { gap: 16px; }
+            .projector-body .option-column .col-header { width: 70px; height: 70px; font-size: 3rem; }
+            .projector-body .option-column .player-name { font-size: 1.2rem; }
+            .projector-body .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); }
+            .projector-body .player-list-card .pl-name { font-size: 1.5rem; }
+            .projector-body .player-list-card .pl-option { font-size: 4rem; }
+            .projector-header h1 { font-size: 1.8rem; }
+            .projector-stats .stat-item { font-size: 1rem; }
         }
         @media (max-width: 480px) {
             .splash-title { font-size: 1.5rem; }
@@ -735,23 +775,23 @@
             .projector-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .option-column .col-header { width: 40px; height: 40px; font-size: 1.5rem; }
             .option-column .player-name { font-size: 0.8rem; padding: 2px 10px; }
-            .lock-notification .lock-name { font-size: 3rem; }
-            .lock-notification .lock-option { font-size: 5rem; }
-            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
             .player-list-card .pl-option { font-size: 2.5rem; min-height: 3.5rem; }
             .player-list-card .pl-name { font-size: 1rem; }
             .admin-actions .btn { font-size: 0.7rem; padding: 10px 12px; min-width: 60px; }
+            .projector-body .projector-grid { gap: 10px; padding: 5px; }
+            .projector-body .option-column .col-header { width: 50px; height: 50px; font-size: 2rem; }
+            .projector-body .option-column .player-name { font-size: 0.9rem; }
+            .projector-body .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
+            .projector-body .player-list-card .pl-name { font-size: 1.2rem; }
+            .projector-body .player-list-card .pl-option { font-size: 3rem; min-height: 4.5rem; }
+            .projector-header h1 { font-size: 1.4rem; }
+            .projector-header .sub { font-size: 0.9rem; }
+            .projector-stats .stat-item { font-size: 0.8rem; gap: 15px; }
         }
     </style>
 </head>
 <body>
-
-<!-- Lock Notification (Admin) -->
-<div class="lock-notification" id="lockNotification">
-    <div class="lock-label">Locked</div>
-    <div class="lock-name" id="notifName">Player</div>
-    <div class="lock-option" id="notifOption">A</div>
-</div>
 
 <!-- Password Modal -->
 <div id="passwordModal">
@@ -777,7 +817,6 @@
 
     <!-- Player View -->
     <div id="playerView">
-        <!-- Setup (Name) -->
         <div id="setupView">
             <div class="splash-title">🎤 GRAND FINALE</div>
             <div class="splash-sub">
@@ -790,8 +829,6 @@
                 <button class="enter-btn" id="enterBtn">Enter &amp; Select</button>
             </div>
         </div>
-
-        <!-- Options & Lock -->
         <div id="optionsView">
             <div class="options-header">
                 <h2>🔐 Choose your answer</h2>
@@ -810,27 +847,42 @@
         </div>
     </div>
 
-    <!-- Admin View (Projector) -->
+    <!-- Admin View (controls + preview) -->
     <div id="adminView">
         <div class="admin-stats">
             <div class="admin-stat-card"><label>Total Players</label><span id="totalCount">0</span></div>
             <div class="admin-stat-card"><label>Locked</label><span id="lockedCount">0</span></div>
         </div>
-
         <div class="admin-display-area" id="adminDisplayArea">
-            <!-- Rendered by JavaScript -->
+            <!-- Rendered by JS -->
         </div>
-
         <div class="admin-actions">
+            <button class="btn btn-projector" id="projectorBtn">📽️ Show Projector</button>
             <button class="btn btn-warning" id="resetBtn">🔄 New Round</button>
             <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
             <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
             <button class="btn btn-clear-correct" id="clearCorrectBtn">✕ Clear Correct</button>
             <button class="btn btn-toggle-view" id="toggleViewBtn">👥 List View</button>
         </div>
-        <p style="color: #64748b; font-size: 0.55rem; text-align: center; margin-top: 4px; opacity:0.6;">
-            Click an option column (A/B/C/D) to mark it as correct. Click "List View" to see each player individually.
+        <p style="color:#64748b; font-size:0.55rem; text-align:center; margin-top:4px; opacity:0.6;">
+            Click an option column (A/B/C/D) to mark it as correct.
         </p>
+    </div>
+</div>
+
+<!-- Projector Overlay – clean, no buttons -->
+<div class="projector-overlay" id="projectorOverlay">
+    <button class="projector-exit" id="projectorExitBtn">✕</button>
+    <div class="projector-header">
+        <h1>📊 NOORUSSALAM – MEGA QUIZ</h1>
+        <div class="sub">Live Results</div>
+    </div>
+    <div class="projector-stats" id="projectorStats">
+        <div class="stat-item">👥 Total: <span id="projTotal">0</span></div>
+        <div class="stat-item">🔒 Locked: <span id="projLocked">0</span></div>
+    </div>
+    <div class="projector-body" id="projectorBody">
+        <!-- Rendered by JS (same content as admin, but larger and no interactivity) -->
     </div>
 </div>
 
@@ -881,22 +933,6 @@
             osc.stop(ctx.currentTime + 0.2);
         } catch (e) {}
     }
-    function playAdminNotification() {
-        try {
-            const ctx = getAudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(880, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.25);
-        } catch (e) {}
-    }
     function triggerVibration() {
         if (navigator.vibrate) navigator.vibrate(200);
     }
@@ -933,7 +969,6 @@
     let isLocked = false;
     let lockData = {};
     let correctOption = null;
-    let notifTimeout = null;
     let hasShownFeedback = false;
     let viewMode = 'group'; // 'group' or 'list'
 
@@ -966,10 +1001,14 @@
     const refreshBtn = document.getElementById('refreshBtn');
     const clearCorrectBtn = document.getElementById('clearCorrectBtn');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
+    const projectorBtn = document.getElementById('projectorBtn');
 
-    const notifDiv = document.getElementById('lockNotification');
-    const notifName = document.getElementById('notifName');
-    const notifOption = document.getElementById('notifOption');
+    // Projector elements
+    const projectorOverlay = document.getElementById('projectorOverlay');
+    const projectorExitBtn = document.getElementById('projectorExitBtn');
+    const projectorBody = document.getElementById('projectorBody');
+    const projTotal = document.getElementById('projTotal');
+    const projLocked = document.getElementById('projLocked');
 
     roomBadge.textContent = `Room: ${ROOM_ID}`;
     if (IS_MOBILE) adminToggleBtn.classList.add('mobile-hidden');
@@ -1107,10 +1146,7 @@
                 };
                 transaction.update(roomRef, { locks: newLocks });
             });
-
-            // Success (listener will update UI)
-            // The listener will call updatePlayerLockState
-
+            // The listener will update UI
         } catch (error) {
             console.error('Lock error:', error);
             let msg = error.message;
@@ -1145,7 +1181,7 @@
     });
 
     // --------------------------------------------------------------
-    // 🟢🔴 Player Feedback
+    // Player Feedback (blink)
     // --------------------------------------------------------------
     function revealFeedback(playerOption) {
         if (!correctOption) return;
@@ -1162,10 +1198,10 @@
                 btn.classList.remove(blinkClass);
                 if (isCorrect) {
                     btn.style.borderColor = '#22c55e';
-                    btn.style.background = 'rgba(34, 197, 94, 0.2)';
+                    btn.style.background = 'rgba(34,197,94,0.2)';
                 } else {
                     btn.style.borderColor = '#ef4444';
-                    btn.style.background = 'rgba(239, 68, 68, 0.2)';
+                    btn.style.background = 'rgba(239,68,68,0.2)';
                 }
             }, 3200);
         }
@@ -1225,7 +1261,7 @@
         adminView.classList.add('active');
         adminToggleBtn.classList.add('active');
         adminToggleBtn.textContent = 'Player';
-        renderProjector();
+        renderAdminView();
     }
 
     function switchToPlayerMode() {
@@ -1263,7 +1299,7 @@
             if (!docSnap.exists()) {
                 lockData = {};
                 correctOption = null;
-                if (currentMode === 'admin') renderProjector();
+                if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     if (!isLocked) {
                         optionBtns.forEach(b => b.disabled = false);
@@ -1272,6 +1308,7 @@
                         playerStatus.className = 'status-msg';
                     }
                 }
+                if (projectorOverlay.classList.contains('active')) renderProjector();
                 return;
             }
             const data = docSnap.data();
@@ -1321,6 +1358,11 @@
 
             // Admin view
             if (currentMode === 'admin') {
+                renderAdminView();
+            }
+
+            // Projector view (if open)
+            if (projectorOverlay.classList.contains('active')) {
                 renderProjector();
             }
         }, (error) => {
@@ -1329,55 +1371,33 @@
     }
 
     // --------------------------------------------------------------
-    // 🖥️ Render Projector (Toggleable Views)
+    // 📊 Render functions
     // --------------------------------------------------------------
     let previousLockKeys = new Set();
 
-    function renderProjector() {
+    function getDisplayData() {
         const entries = Object.values(lockData);
         const total = entries.length;
-        totalCount.textContent = total;
         const locked = entries.filter(e => e.option).length;
-        lockedCount.textContent = locked;
+        return { entries, total, locked, sorted: [...entries].sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0)) };
+    }
 
-        // Notification for new locks
-        const currentKeys = new Set(Object.keys(lockData));
-        const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
-        if (newKeys.length > 0) {
-            const newestId = newKeys[newKeys.length - 1];
-            const newEntry = lockData[newestId];
-            if (newEntry) {
-                notifName.textContent = newEntry.playerName || 'Player';
-                notifOption.textContent = newEntry.option || '?';
-                notifDiv.classList.add('active');
-                playAdminNotification();
-                if (notifTimeout) clearTimeout(notifTimeout);
-                notifTimeout = setTimeout(() => {
-                    notifDiv.classList.remove('active');
-                    notifTimeout = null;
-                }, 3000);
-            }
-        }
-        previousLockKeys = new Set(Object.keys(lockData));
+    function renderProjector() {
+        const { entries, total, locked, sorted } = getDisplayData();
+        projTotal.textContent = total;
+        projLocked.textContent = locked;
 
-        // Sort entries by time (oldest first)
-        const sortedEntries = [...entries].sort((a, b) => {
-            const ta = a.timestamp?.seconds || 0;
-            const tb = b.timestamp?.seconds || 0;
-            return ta - tb;
-        });
+        // Detect new locks for notification (only in admin, not in projector)
+        // but we keep it silent in projector.
 
         let html = '';
-
         if (viewMode === 'group') {
-            // ---- GROUP VIEW (Columns) ----
             const groups = { A: [], B: [], C: [], D: [] };
-            sortedEntries.forEach(entry => {
+            sorted.forEach(entry => {
                 const opt = entry.option || '—';
                 if (groups[opt]) groups[opt].push(entry);
                 else groups[opt] = [entry];
             });
-
             html = '<div class="projector-grid">';
             OPTIONS.forEach(opt => {
                 const players = groups[opt] || [];
@@ -1388,40 +1408,109 @@
                 const nameList = players.map(p => 
                     `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
                 ).join('');
-
                 html += `
-                    <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
-                        <div class="col-header" style="background: ${color};">${opt}</div>
-                        <div class="col-count">${count} player${count !== 1 ? 's' : ''}</div>
+                    <div class="option-column col-${opt} ${correctClass}">
+                        <div class="col-header" style="background:${color};">${opt}</div>
+                        <div class="col-count">${count}</div>
                         ${count > 0 ? nameList : '<div class="empty-col">—</div>'}
                     </div>
                 `;
             });
             html += '</div>';
+        } else {
+            // list view
+            if (sorted.length === 0) {
+                html = '<div style="text-align:center; color:#475569; padding:40px;">No players yet...</div>';
+            } else {
+                html = '<div class="player-list-grid">';
+                sorted.forEach(entry => {
+                    const name = entry.playerName || 'Anonymous';
+                    const opt = entry.option || '—';
+                    const time = entry.timestamp?.seconds ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString('en-IN', { hour12: false }) : '--:--';
+                    const isCorrect = (correctOption && opt === correctOption);
+                    const isWrong = (correctOption && opt !== '—' && opt !== correctOption);
+                    let statusClass = '';
+                    let statusText = '';
+                    if (isCorrect) { statusClass = 'card-correct'; statusText = '✅ Correct'; }
+                    else if (isWrong) { statusClass = 'card-wrong'; statusText = '❌ Wrong'; }
+                    const optClass = `opt-${opt}`;
+                    html += `
+                        <div class="player-list-card ${statusClass}">
+                            <div class="pl-name">${name}</div>
+                            <div class="pl-option ${optClass}">${opt}</div>
+                            ${statusText ? `<div class="pl-status ${statusClass}">${statusText}</div>` : ''}
+                            <div class="pl-time">⏱ ${time}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+        }
+        projectorBody.innerHTML = html;
+    }
 
-            // Attach click listeners for correct answer (group view)
+    function renderAdminView() {
+        const { entries, total, locked, sorted } = getDisplayData();
+        totalCount.textContent = total;
+        lockedCount.textContent = locked;
+
+        // New lock notification (only in admin)
+        const currentKeys = new Set(Object.keys(lockData));
+        const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
+        if (newKeys.length > 0) {
+            // Just a subtle console notification; we already have the admin panel live
+            // Optionally we could show a toast, but we keep it clean.
+            // We already have the display updating.
+        }
+        previousLockKeys = new Set(Object.keys(lockData));
+
+        let html = '';
+        if (viewMode === 'group') {
+            const groups = { A: [], B: [], C: [], D: [] };
+            sorted.forEach(entry => {
+                const opt = entry.option || '—';
+                if (groups[opt]) groups[opt].push(entry);
+                else groups[opt] = [entry];
+            });
+            html = '<div class="projector-grid">';
+            OPTIONS.forEach(opt => {
+                const players = groups[opt] || [];
+                const count = players.length;
+                const color = OPTION_COLORS[opt] || '#94a3b8';
+                const isCorrect = (correctOption === opt);
+                const correctClass = isCorrect ? 'correct-option' : '';
+                const nameList = players.map(p => 
+                    `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
+                ).join('');
+                html += `
+                    <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
+                        <div class="col-header" style="background:${color};">${opt}</div>
+                        <div class="col-count">${count}</div>
+                        ${count > 0 ? nameList : '<div class="empty-col">—</div>'}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            // Attach click listeners for admin
             setTimeout(() => {
                 document.querySelectorAll('.option-column').forEach(col => {
-                    col.addEventListener('click', () => {
+                    col.onclick = () => {
                         if (currentMode !== 'admin') return;
                         const opt = col.dataset.option;
                         if (opt) {
                             const newCorrect = (correctOption === opt) ? null : opt;
                             updateCorrectOption(newCorrect);
                         }
-                    });
+                    };
                 });
             }, 50);
-
             toggleViewBtn.textContent = '👥 List View';
-
         } else {
-            // ---- LIST VIEW (Each player individually) ----
-            if (sortedEntries.length === 0) {
-                html = '<div style="text-align:center; color:#475569; padding:40px; grid-column:1/-1;">No players yet...</div>';
+            if (sorted.length === 0) {
+                html = '<div style="text-align:center; color:#475569; padding:40px;">No players yet...</div>';
             } else {
                 html = '<div class="player-list-grid">';
-                sortedEntries.forEach(entry => {
+                sorted.forEach(entry => {
                     const name = entry.playerName || 'Anonymous';
                     const opt = entry.option || '—';
                     const time = entry.timestamp?.seconds ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString('en-IN', { hour12: false }) : '--:--';
@@ -1445,7 +1534,6 @@
             }
             toggleViewBtn.textContent = '📊 Group View';
         }
-
         adminDisplayArea.innerHTML = html;
     }
 
@@ -1463,11 +1551,31 @@
     }
 
     // --------------------------------------------------------------
-    // Toggle View
+    // Toggle View (admin)
     // --------------------------------------------------------------
     toggleViewBtn.addEventListener('click', () => {
         viewMode = (viewMode === 'group') ? 'list' : 'group';
+        if (currentMode === 'admin') renderAdminView();
+        if (projectorOverlay.classList.contains('active')) renderProjector();
+    });
+
+    // --------------------------------------------------------------
+    // Projector controls
+    // --------------------------------------------------------------
+    projectorBtn.addEventListener('click', () => {
+        projectorOverlay.classList.add('active');
         renderProjector();
+    });
+
+    projectorExitBtn.addEventListener('click', () => {
+        projectorOverlay.classList.remove('active');
+    });
+
+    // Also close projector with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && projectorOverlay.classList.contains('active')) {
+            projectorOverlay.classList.remove('active');
+        }
     });
 
     // --------------------------------------------------------------
@@ -1492,8 +1600,6 @@
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { locks: {}, roundStart: Timestamp.now(), correctOption: null }, { merge: true });
             alert('New round started!');
-            if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
-            previousLockKeys = new Set();
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 isLocked = false;
                 hasShownFeedback = false;
@@ -1510,6 +1616,7 @@
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
             }
+            if (projectorOverlay.classList.contains('active')) renderProjector();
         } catch (error) {
             alert('Failed: ' + error.message);
         }
@@ -1521,8 +1628,6 @@
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { locks: {}, roundStart: null, correctOption: null }, { merge: true });
             alert('Quiz ended. All data cleared.');
-            if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
-            previousLockKeys = new Set();
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 isLocked = false;
                 hasShownFeedback = false;
@@ -1539,6 +1644,7 @@
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
             }
+            if (projectorOverlay.classList.contains('active')) renderProjector();
         } catch (error) {
             alert('Failed: ' + error.message);
         }
@@ -1551,11 +1657,10 @@
     // --------------------------------------------------------------
     // Initial load
     // --------------------------------------------------------------
-    console.log('Quiz Lock System – with Toggleable Admin Views (Group / Player List)');
+    console.log('Quiz Lock System – Admin + Clean Projector loaded');
 
     window.addEventListener('beforeunload', () => {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
-        if (notifTimeout) clearTimeout(notifTimeout);
     });
 </script>
 </body>
