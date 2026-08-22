@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NOORUSSALAM - Quiz Lock</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@100..800&display=swap" rel="stylesheet">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <style>
+        /* ----- Reset & Fullscreen ----- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
+            font-family: 'Anek Malayalam', 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: #0a0e1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(ellipse at 50% 80%, rgba(250, 204, 21, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 20%, rgba(74, 222, 128, 0.04) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 100%;
+            max-height: 100vh;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ----- Header (Admin only) ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .header h1 {
+            color: #facc15;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .header .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header .room-badge {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 4px 16px;
+            border-radius: 50px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .admin-toggle {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(51, 65, 85, 0.3);
+            color: #94a3b8;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+        .admin-toggle:hover { background: rgba(250, 204, 21, 0.15); color: #facc15; border-color: #facc1550; }
+        .admin-toggle.active { background: rgba(250, 204, 21, 0.15); color: #facc15; border-color: #facc1550; }
+        .admin-toggle.mobile-hidden { display: none !important; }
+
+        /* ============================================================ */
+        /* PLAYER VIEW – Name entry then Options */
+        /* ============================================================ */
+        #playerView {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+            min-height: 0;
+            position: relative;
+        }
+        #setupView {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #setupView.hidden { display: none; }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(40px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .splash-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #facc15;
+            margin-bottom: 12px;
+            text-shadow: 0 0 40px rgba(250, 204, 21, 0.15);
+            line-height: 1.3;
+        }
+        .splash-sub {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: #94a3b8;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            max-width: 380px;
+        }
+        .splash-sub span { color: #facc15; font-weight: 600; }
+        .setup-name-area {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 320px;
+            gap: 14px;
+        }
+        .setup-name-area input {
+            padding: 16px 24px;
+            border-radius: 60px;
+            border: 2px solid rgba(51, 65, 85, 0.6);
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            outline: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .setup-name-area input:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.08);
+            background: rgba(30, 41, 59, 0.7);
+        }
+        .setup-name-area input::placeholder {
+            color: #64748b;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .setup-name-area .enter-btn {
+            padding: 16px;
+            border-radius: 60px;
+            border: none;
+            background: linear-gradient(135deg, #facc15, #eab308);
+            color: #0a0e1a;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(250, 204, 21, 0.25);
+            letter-spacing: 1px;
+        }
+        .setup-name-area .enter-btn:hover { transform: scale(1.02); box-shadow: 0 8px 40px rgba(250, 204, 21, 0.35); }
+        .setup-name-area .enter-btn:active { transform: scale(0.96); }
+        .setup-name-area .enter-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ---- Options & Lock View ---- */
+        #optionsView {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+            padding: 10px 0;
+        }
+        #optionsView.active { display: flex; }
+
+        .options-header {
+            text-align: center;
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+        .options-header h2 {
+            font-size: 1.4rem;
+            color: #facc15;
+            font-weight: 600;
+        }
+        .options-header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            flex: 1;
+            align-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 10px;
+        }
+        .option-btn {
+            aspect-ratio: 1/1;
+            border-radius: 20px;
+            border: 4px solid #334155;
+            background: rgba(30, 41, 59, 0.5);
+            color: #e2e8f0;
+            font-size: 3.5rem;
+            font-weight: 800;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.3);
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Anek Malayalam', sans-serif;
+        }
+        .option-btn:active:not(.selected):not(:disabled) {
+            transform: scale(0.95);
+        }
+        .option-btn.selected {
+            border-color: #facc15;
+            background: rgba(250, 204, 21, 0.15);
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.2), 0 4px 0 #b45309;
+            transform: translateY(4px);
+            color: #facc15;
+        }
+        .option-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: scale(0.95);
+        }
+
+        /* Blink animations for player feedback */
+        @keyframes blinkGreen {
+            0% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
+            25% { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 10px #22c55e; }
+            50% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
+            75% { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 10px #22c55e; }
+            100% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
+        }
+        @keyframes blinkRed {
+            0% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
+            25% { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); box-shadow: 0 0 10px #ef4444; }
+            50% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
+            75% { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); box-shadow: 0 0 10px #ef4444; }
+            100% { border-color: #ef4444; background: rgba(239, 68, 68, 0.3); box-shadow: 0 0 40px #ef4444; }
+        }
+        .option-btn.blink-green {
+            animation: blinkGreen 0.8s ease 4;
+            border-color: #22c55e !important;
+            background: rgba(34, 197, 94, 0.3) !important;
+            box-shadow: 0 0 40px #22c55e !important;
+        }
+        .option-btn.blink-red {
+            animation: blinkRed 0.8s ease 4;
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.3) !important;
+            box-shadow: 0 0 40px #ef4444 !important;
+        }
+        .option-btn.blink-green, .option-btn.blink-red {
+            cursor: default;
+        }
+
+        .lock-area {
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+            flex-shrink: 0;
+        }
+        .lock-btn {
+            padding: 16px 40px;
+            border-radius: 60px;
+            border: none;
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #0f172a;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #b45309;
+            transition: all 0.15s ease;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Anek Malayalam', sans-serif;
+        }
+        .lock-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 4px 0 #b45309; }
+        .lock-btn:disabled {
+            opacity: 0.4;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #b45309;
+            cursor: not-allowed;
+        }
+        .lock-btn.locked {
+            background: linear-gradient(135deg, #4ade80, #16a34a);
+            box-shadow: 0 8px 0 #0f7a3a;
+            color: #fff;
+        }
+        .lock-btn.revealed {
+            background: #64748b;
+            box-shadow: 0 8px 0 #475569;
+            color: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            text-align: center;
+            padding: 6px;
+            font-size: 1rem;
+            color: #94a3b8;
+            min-height: 2rem;
+        }
+        .status-msg.success { color: #4ade80; }
+        .status-msg.warning { color: #facc15; }
+        .status-msg.error { color: #f87171; }
+
+        /* ============================================================ */
+        /* ADMIN VIEW – Kahoot‑Style Projector */
+        /* ============================================================ */
+        #adminView {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+            padding-top: 5px;
+        }
+        #adminView.active { display: flex; }
+        #playerView.hidden { display: none; }
+
+        .admin-stats {
+            display: flex;
+            gap: 16px;
+            margin: 8px 0 16px;
+            flex-shrink: 0;
+        }
+        .admin-stat-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            padding: 12px 20px;
+            border-radius: 16px;
+            flex: 1;
+            border-left: 3px solid #facc15;
+            text-align: center;
+        }
+        .admin-stat-card label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+        }
+        .admin-stat-card span {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #facc15;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Kahoot‑style grid */
+        .projector-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px 10px;
+            align-content: start;
+        }
+        .option-column {
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            padding: 15px 10px;
+            border: 2px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .option-column:hover {
+            background: rgba(30, 41, 59, 0.6);
+        }
+        .option-column .col-header {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .option-column .col-count {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 16px;
+            border-radius: 30px;
+        }
+        .option-column .player-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #f1f5f9;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 14px;
+            border-radius: 30px;
+            margin: 4px 0;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Option colors */
+        .option-column.col-A .col-header { background: #22c55e; }
+        .option-column.col-B .col-header { background: #3b82f6; }
+        .option-column.col-C .col-header { background: #eab308; }
+        .option-column.col-D .col-header { background: #ef4444; }
+
+        .option-column.col-A { border-top: 6px solid #22c55e; }
+        .option-column.col-B { border-top: 6px solid #3b82f6; }
+        .option-column.col-C { border-top: 6px solid #eab308; }
+        .option-column.col-D { border-top: 6px solid #ef4444; }
+
+        /* When an option is marked correct – highlight the column */
+        .option-column.correct-option {
+            border: 4px solid #facc15;
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.3);
+            background: rgba(250, 204, 21, 0.05);
+        }
+        .option-column.correct-option .col-header {
+            box-shadow: 0 0 60px rgba(250, 204, 21, 0.5);
+        }
+
+        .empty-col {
+            color: #475569;
+            font-size: 0.9rem;
+            padding: 20px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Admin controls */
+        .admin-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            padding-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .admin-actions .btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            flex: 1;
+            min-width: 100px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+        }
+        .admin-actions .btn-danger { background: #dc2626; color: white; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.2); }
+        .admin-actions .btn-danger:hover { transform: scale(1.02); background: #b91c1c; }
+        .admin-actions .btn-warning { background: #f59e0b; color: #0a0e1a; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2); }
+        .admin-actions .btn-warning:hover { transform: scale(1.02); background: #d97706; }
+        .admin-actions .btn-secondary { background: rgba(71, 85, 105, 0.5); color: #e2e8f0; box-shadow: 0 4px 20px rgba(71, 85, 105, 0.1); }
+        .admin-actions .btn-secondary:hover { transform: scale(1.02); background: rgba(71, 85, 105, 0.7); }
+        .admin-actions .btn-clear-correct {
+            background: rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+        }
+        .admin-actions .btn-clear-correct:hover { transform: scale(1.02); background: rgba(139, 92, 246, 0.6); }
+
+        /* ----- Lock Notification (Admin) ----- */
+        .lock-notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9998;
+            animation: notifFadeIn 0.35s ease;
+            padding: 30px;
+            text-align: center;
+        }
+        .lock-notification.active { display: flex; }
+        @keyframes notifFadeIn {
+            0% { opacity: 0; transform: scale(0.96); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .lock-notification .lock-name {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            animation: nameSlide 0.5s ease 0.15s both;
+        }
+        .lock-notification .lock-option {
+            font-size: 8rem;
+            font-weight: 800;
+            color: #facc15;
+            text-shadow: 0 0 60px rgba(250, 204, 21, 0.3);
+            line-height: 1;
+            animation: rankPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes nameSlide {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes rankPop {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .lock-notification .lock-label {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            animation: nameSlide 0.5s ease 0.3s both;
+        }
+
+        /* ----- Password Modal ----- */
+        #passwordModal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: blur(14px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #passwordModal.active { display: flex; }
+        .modal-box {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(16px);
+            padding: 32px 28px;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+        }
+        .modal-box h2 { color: #facc15; margin-bottom: 4px; font-weight: 600; }
+        .modal-box p { color: #94a3b8; margin-bottom: 20px; font-size: 0.85rem; }
+        .modal-box input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 2px solid rgba(51, 65, 85, 0.4);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+        .modal-box input:focus { outline: none; border-color: #facc15; }
+        .modal-box button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #facc15, #eab308);
+            color: #0a0e1a;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .modal-box button:hover { transform: scale(1.02); }
+        .modal-box .error-msg { color: #f87171; margin-top: 10px; display: block; text-align: center; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .admin-toggle.mobile-hidden { display: none !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .projector-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 10px 5px;
+            }
+            .option-column .col-header { width: 50px; height: 50px; font-size: 2rem; }
+            .option-column .player-name { font-size: 0.9rem; }
+        }
+        @media (max-width: 480px) {
+            .splash-title { font-size: 1.5rem; }
+            .splash-sub { font-size: 1rem; }
+            .options-grid { gap: 12px; padding: 5px; }
+            .option-btn { font-size: 2.8rem; }
+            .lock-btn { font-size: 1.2rem; padding: 14px 30px; }
+            .admin-stats { flex-direction: column; gap: 8px; }
+            .projector-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .option-column .col-header { width: 40px; height: 40px; font-size: 1.5rem; }
+            .option-column .player-name { font-size: 0.8rem; padding: 2px 10px; }
+            .lock-notification .lock-name { font-size: 3rem; }
+            .lock-notification .lock-option { font-size: 5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Lock Notification (Admin) -->
+<div class="lock-notification" id="lockNotification">
+    <div class="lock-label">Locked</div>
+    <div class="lock-name" id="notifName">Player</div>
+    <div class="lock-option" id="notifOption">A</div>
+</div>
+
+<!-- Password Modal -->
+<div id="passwordModal">
+    <div class="modal-box">
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+        <h2>Admin Access</h2>
+        <p>Enter password to continue.</p>
+        <input type="password" id="adminPasswordInput" placeholder="Enter password" autocomplete="off">
+        <button id="loginAdminBtn">Unlock</button>
+        <span id="loginError" class="error-msg"></span>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="header" id="mainHeader">
+        <h1>NOORUSSALAM - MEGA QUIZ</h1>
+        <div class="actions">
+            <span class="room-badge" id="roomBadge">Room: quiz123</span>
+            <button class="admin-toggle" id="adminToggleBtn">Admin</button>
+        </div>
+    </div>
+
+    <!-- Player View -->
+    <div id="playerView">
+        <!-- Setup (Name) -->
+        <div id="setupView">
+            <div class="splash-title">🎤 GRAND FINALE</div>
+            <div class="splash-sub">
+                നൂറുസ്സലാം മദ്രസ <span>SKSBV</span> യൂണിറ്റ് നടത്തുന്ന<br>
+                മെഗാ ക്വിസ് റിയാലിറ്റി ഷോയിലേക്ക്<br>
+                <span>സ്വാഗതം</span>
+            </div>
+            <div class="setup-name-area">
+                <input type="text" id="playerNameInput" placeholder="നിങ്ങളുടെ പേര് നൽകുക" maxlength="20">
+                <button class="enter-btn" id="enterBtn">Enter &amp; Select</button>
+            </div>
+        </div>
+
+        <!-- Options & Lock -->
+        <div id="optionsView">
+            <div class="options-header">
+                <h2>🔐 Choose your answer</h2>
+                <p>Tap an option then Lock</p>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" data-option="A">A</button>
+                <button class="option-btn" data-option="B">B</button>
+                <button class="option-btn" data-option="C">C</button>
+                <button class="option-btn" data-option="D">D</button>
+            </div>
+            <div class="lock-area">
+                <button class="lock-btn" id="lockBtn" disabled>🔒 Lock</button>
+            </div>
+            <div class="status-msg" id="playerStatus">Select an option</div>
+        </div>
+    </div>
+
+    <!-- Admin View (Projector) -->
+    <div id="adminView">
+        <div class="admin-stats">
+            <div class="admin-stat-card"><label>Total Players</label><span id="totalCount">0</span></div>
+            <div class="admin-stat-card"><label>Locked</label><span id="lockedCount">0</span></div>
+        </div>
+
+        <div class="projector-grid" id="projectorGrid">
+            <!-- will be populated by JS -->
+        </div>
+
+        <div class="admin-actions">
+            <button class="btn btn-warning" id="resetBtn">🔄 New Round</button>
+            <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
+            <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
+            <button class="btn btn-clear-correct" id="clearCorrectBtn">✕ Clear Correct</button>
+        </div>
+        <p style="color: #64748b; font-size: 0.55rem; text-align: center; margin-top: 4px; opacity:0.6;">
+            Click an option column (A/B/C/D) to mark it as correct. Players will see green/red blink.
+        </p>
+    </div>
+</div>
+
+<script type="module">
+    // --------------------------------------------------------------
+    // 🔥 FIREBASE CONFIG – REPLACE WITH YOUR OWN!
+    // --------------------------------------------------------------
+    import { initializeApp } from 'firebase/app';
+    import { getAuth, signInAnonymously, signOut, onAuthStateChanged } from 'firebase/auth';
+    import { getFirestore, doc, runTransaction, onSnapshot, setDoc, Timestamp } from 'firebase/firestore';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBmPd-Ir4X_ZLmRqgZr53NuA_9wSgNIfsw",
+        authDomain: "quiz-buzzer-app-edbdf.firebaseapp.com",
+        projectId: "quiz-buzzer-app-edbdf",
+        storageBucket: "quiz-buzzer-app-edbdf.firebasestorage.app",
+        messagingSenderId: "563009152379",
+        appId: "1:563009152379:web:a062996a15c5cb52f9c9de",
+        measurementId: "G-XJHJDDW3ZK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --------------------------------------------------------------
+    // 🔊 Audio & Vibration
+    // --------------------------------------------------------------
+    let audioCtx = null;
+
+    function getAudioContext() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        return audioCtx;
+    }
+
+    function playLockSound() {
+        try {
+            const ctx = getAudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+        } catch (e) {}
+    }
+
+    function playAdminNotification() {
+        try {
+            const ctx = getAudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+        } catch (e) {}
+    }
+
+    function triggerVibration() {
+        if (navigator.vibrate) navigator.vibrate(200);
+    }
+
+    // --------------------------------------------------------------
+    // 📱 Device Detection
+    // --------------------------------------------------------------
+    function isMobileDevice() {
+        return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone|Opera Mini|IEMobile/i.test(navigator.userAgent);
+    }
+    const IS_MOBILE = isMobileDevice();
+
+    // --------------------------------------------------------------
+    // Constants
+    // --------------------------------------------------------------
+    const ROOM_ID = 'quiz123';
+    const ADMIN_PASSWORD = 'admin123';
+    const OPTIONS = ['A', 'B', 'C', 'D'];
+    const OPTION_COLORS = {
+        'A': '#22c55e',
+        'B': '#3b82f6',
+        'C': '#eab308',
+        'D': '#ef4444'
+    };
+
+    // --------------------------------------------------------------
+    // State
+    // --------------------------------------------------------------
+    let currentMode = 'player';
+    let currentUser = null;
+    let unsubscribeSnapshot = null;
+    let playerName = '';
+    let selectedOption = null;
+    let isLocked = false;
+    let lockData = {};          // { uid: { playerName, option, timestamp } }
+    let correctOption = null;   // 'A', 'B', 'C', 'D' or null
+    let notifTimeout = null;
+    let hasShownFeedback = false; // to prevent multiple blink triggers
+
+    // --------------------------------------------------------------
+    // DOM Elements
+    // --------------------------------------------------------------
+    const playerView = document.getElementById('playerView');
+    const adminView = document.getElementById('adminView');
+    const adminToggleBtn = document.getElementById('adminToggleBtn');
+    const passwordModal = document.getElementById('passwordModal');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const adminPasswordInput = document.getElementById('adminPasswordInput');
+    const loginAdminBtn = document.getElementById('loginAdminBtn');
+    const loginError = document.getElementById('loginError');
+
+    const setupView = document.getElementById('setupView');
+    const optionsView = document.getElementById('optionsView');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const enterBtn = document.getElementById('enterBtn');
+
+    const optionBtns = document.querySelectorAll('.option-btn');
+    const lockBtn = document.getElementById('lockBtn');
+    const playerStatus = document.getElementById('playerStatus');
+
+    const totalCount = document.getElementById('totalCount');
+    const lockedCount = document.getElementById('lockedCount');
+    const projectorGrid = document.getElementById('projectorGrid');
+    const resetBtn = document.getElementById('resetBtn');
+    const endQuizBtn = document.getElementById('endQuizBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const clearCorrectBtn = document.getElementById('clearCorrectBtn');
+
+    const notifDiv = document.getElementById('lockNotification');
+    const notifName = document.getElementById('notifName');
+    const notifOption = document.getElementById('notifOption');
+
+    roomBadge.textContent = `Room: ${ROOM_ID}`;
+    if (IS_MOBILE) adminToggleBtn.classList.add('mobile-hidden');
+
+    // --------------------------------------------------------------
+    // 📝 Enter Button Logic
+    // --------------------------------------------------------------
+    enterBtn.addEventListener('click', () => {
+        const name = playerNameInput.value.trim();
+        if (name) {
+            playerName = name;
+            localStorage.setItem('quizPlayerName', name);
+            setupView.classList.add('hidden');
+            optionsView.classList.add('active');
+            // Reset selection
+            selectedOption = null;
+            isLocked = false;
+            hasShownFeedback = false;
+            optionBtns.forEach(b => {
+                b.classList.remove('selected', 'blink-green', 'blink-red');
+                b.disabled = false;
+            });
+            lockBtn.disabled = true;
+            lockBtn.textContent = '🔒 Lock';
+            lockBtn.classList.remove('locked', 'revealed');
+            playerStatus.textContent = 'Select an option';
+            playerStatus.className = 'status-msg';
+            // If already locked in this round, show status
+            if (currentUser && lockData[currentUser.uid]) {
+                const existing = lockData[currentUser.uid];
+                isLocked = true;
+                selectedOption = existing.option;
+                optionBtns.forEach(b => {
+                    b.disabled = true;
+                    if (b.dataset.option === selectedOption) b.classList.add('selected');
+                });
+                lockBtn.disabled = true;
+                lockBtn.textContent = '✅ Locked';
+                lockBtn.classList.add('locked');
+                playerStatus.textContent = `You locked ${selectedOption}`;
+                playerStatus.className = 'status-msg success';
+                // If correct answer already revealed, show feedback
+                if (correctOption) {
+                    revealFeedback(selectedOption);
+                }
+            }
+            // If correct answer already set, show status and disable locks
+            if (correctOption) {
+                // Disable locking for new players
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                lockBtn.textContent = '🔒 Locked (Answer Revealed)';
+                lockBtn.classList.add('revealed');
+                playerStatus.textContent = 'Answer already revealed.';
+                playerStatus.className = 'status-msg warning';
+                // If player hasn't locked, they can't lock now
+            }
+        } else {
+            playerNameInput.focus();
+            playerNameInput.style.borderColor = '#f87171';
+            setTimeout(() => playerNameInput.style.borderColor = 'rgba(51,65,85,0.6)', 1000);
+        }
+    });
+
+    playerNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') enterBtn.click(); });
+    playerNameInput.addEventListener('input', () => {
+        playerNameInput.value = playerNameInput.value.toUpperCase();
+    });
+
+    const savedName = localStorage.getItem('quizPlayerName');
+    if (savedName) {
+        playerNameInput.value = savedName.toUpperCase();
+        playerName = savedName.toUpperCase();
+    }
+
+    // --------------------------------------------------------------
+    // Options selection
+    // --------------------------------------------------------------
+    optionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (isLocked) return;
+            if (correctOption) return; // cannot change after reveal
+            const opt = btn.dataset.option;
+            optionBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOption = opt;
+            lockBtn.disabled = false;
+            playerStatus.textContent = `Selected: ${opt}`;
+            playerStatus.className = 'status-msg';
+        });
+    });
+
+    // --------------------------------------------------------------
+    // Lock action
+    // --------------------------------------------------------------
+    lockBtn.addEventListener('click', async () => {
+        if (isLocked) return;
+        if (!selectedOption) return;
+        if (!currentUser) {
+            playerStatus.textContent = 'Not logged in. Please refresh.';
+            playerStatus.className = 'status-msg error';
+            return;
+        }
+        if (lockData[currentUser.uid]) {
+            playerStatus.textContent = 'Already locked!';
+            playerStatus.className = 'status-msg warning';
+            return;
+        }
+        if (correctOption) {
+            playerStatus.textContent = 'Answer already revealed – cannot lock.';
+            playerStatus.className = 'status-msg error';
+            return;
+        }
+
+        lockBtn.disabled = true;
+        optionBtns.forEach(b => b.disabled = true);
+        playerStatus.textContent = 'Locking...';
+        playerStatus.className = 'status-msg';
+
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            const result = await runTransaction(db, async (transaction) => {
+                const docSnap = await transaction.get(roomRef);
+                if (!docSnap.exists()) {
+                    transaction.set(roomRef, { locks: {}, roundStart: Timestamp.now() });
+                    return { success: true };
+                }
+                const data = docSnap.data();
+                const locks = data.locks || {};
+                if (locks[currentUser.uid]) {
+                    throw new Error('Already locked');
+                }
+                // If correctOption is already set, prevent new locks
+                if (data.correctOption) {
+                    throw new Error('Answer already revealed');
+                }
+                const newLocks = { ...locks };
+                newLocks[currentUser.uid] = {
+                    playerName: playerName,
+                    option: selectedOption,
+                    timestamp: Timestamp.now()
+                };
+                transaction.update(roomRef, { locks: newLocks });
+                return { success: true };
+            });
+
+            if (result.success) {
+                isLocked = true;
+                lockBtn.textContent = '✅ Locked';
+                lockBtn.classList.add('locked');
+                playerStatus.textContent = `You locked ${selectedOption}`;
+                playerStatus.className = 'status-msg success';
+                playLockSound();
+                triggerVibration();
+                // If correct option was set during transaction (unlikely, but handle)
+                if (correctOption) {
+                    revealFeedback(selectedOption);
+                }
+            }
+        } catch (error) {
+            console.error('Lock error:', error);
+            let msg = error.message;
+            if (msg.includes('Already locked')) {
+                msg = 'You have already locked!';
+            } else if (msg.includes('Answer already revealed')) {
+                msg = 'Answer already revealed – cannot lock now.';
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                lockBtn.textContent = '🔒 Locked (Answer Revealed)';
+                lockBtn.classList.add('revealed');
+                playerStatus.textContent = msg;
+                playerStatus.className = 'status-msg error';
+                return;
+            } else {
+                msg = 'Error: ' + msg;
+            }
+            playerStatus.textContent = msg;
+            playerStatus.className = 'status-msg error';
+            if (msg.includes('already locked')) {
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                isLocked = true;
+            } else {
+                // allow retry
+                lockBtn.disabled = false;
+                optionBtns.forEach(b => b.disabled = false);
+                if (selectedOption) {
+                    document.querySelector(`.option-btn[data-option="${selectedOption}"]`)?.classList.add('selected');
+                }
+            }
+        }
+    });
+
+    // --------------------------------------------------------------
+    // 🟢🔴 Player Feedback function (blink)
+    // --------------------------------------------------------------
+    function revealFeedback(playerOption) {
+        if (!correctOption) return;
+        // Only show feedback if player has locked
+        if (!isLocked) return;
+        // Avoid repeated triggers
+        if (hasShownFeedback) return;
+        hasShownFeedback = true;
+
+        const isCorrect = playerOption === correctOption;
+        const blinkClass = isCorrect ? 'blink-green' : 'blink-red';
+        // Find the button corresponding to the player's option
+        const btn = document.querySelector(`.option-btn[data-option="${playerOption}"]`);
+        if (btn) {
+            btn.classList.add(blinkClass);
+            // Remove classes after animation ends (4 blinks ~ 3.2s)
+            setTimeout(() => {
+                btn.classList.remove(blinkClass);
+                // Keep a persistent indication
+                if (isCorrect) {
+                    btn.style.borderColor = '#22c55e';
+                    btn.style.background = 'rgba(34, 197, 94, 0.2)';
+                } else {
+                    btn.style.borderColor = '#ef4444';
+                    btn.style.background = 'rgba(239, 68, 68, 0.2)';
+                }
+            }, 3200);
+        }
+        // Update status message
+        if (isCorrect) {
+            playerStatus.textContent = '✅ Correct!';
+            playerStatus.className = 'status-msg success';
+        } else {
+            playerStatus.textContent = '❌ Wrong answer';
+            playerStatus.className = 'status-msg error';
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Admin password
+    // --------------------------------------------------------------
+    function verifyPassword(pass) { return pass === ADMIN_PASSWORD; }
+    function showAdminLogin() {
+        if (IS_MOBILE) return;
+        getAudioContext();
+        passwordModal.classList.add('active');
+        adminPasswordInput.value = '';
+        loginError.textContent = '';
+        adminPasswordInput.focus();
+    }
+    function hideAdminLogin() { passwordModal.classList.remove('active'); }
+    function handleAdminLogin() {
+        if (IS_MOBILE) return;
+        const pass = adminPasswordInput.value;
+        if (!pass) { loginError.textContent = 'Enter password.'; return; }
+        if (verifyPassword(pass)) {
+            hideAdminLogin();
+            switchToAdminMode();
+        } else {
+            loginError.textContent = 'Wrong password!';
+            adminPasswordInput.value = '';
+            adminPasswordInput.focus();
+        }
+    }
+
+    adminToggleBtn.addEventListener('click', () => {
+        if (IS_MOBILE) return;
+        getAudioContext();
+        if (currentMode === 'admin') switchToPlayerMode();
+        else showAdminLogin();
+    });
+    modalCloseBtn.addEventListener('click', hideAdminLogin);
+    loginAdminBtn.addEventListener('click', handleAdminLogin);
+    adminPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAdminLogin(); });
+
+    // --------------------------------------------------------------
+    // Mode switching
+    // --------------------------------------------------------------
+    function switchToAdminMode() {
+        if (IS_MOBILE) return;
+        currentMode = 'admin';
+        playerView.classList.add('hidden');
+        adminView.classList.add('active');
+        adminToggleBtn.classList.add('active');
+        adminToggleBtn.textContent = 'Player';
+        renderProjector();
+    }
+
+    function switchToPlayerMode() {
+        currentMode = 'player';
+        playerView.classList.remove('hidden');
+        adminView.classList.remove('active');
+        adminToggleBtn.classList.remove('active');
+        adminToggleBtn.textContent = 'Admin';
+    }
+
+    // --------------------------------------------------------------
+    // Auth
+    // --------------------------------------------------------------
+    async function resetPlayerSession() {
+        try {
+            if (auth.currentUser) await signOut(auth);
+            await signInAnonymously(auth);
+        } catch (error) { console.error('Login error:', error); }
+    }
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            console.log('User UID:', user.uid);
+            connectToRoom(ROOM_ID);
+        } else { resetPlayerSession(); }
+    });
+
+    // --------------------------------------------------------------
+    // Firestore Listener
+    // --------------------------------------------------------------
+    function connectToRoom(roomId) {
+        if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+        const roomRef = doc(db, 'rooms', roomId);
+        unsubscribeSnapshot = onSnapshot(roomRef, (docSnap) => {
+            if (!docSnap.exists()) {
+                lockData = {};
+                correctOption = null;
+                if (currentMode === 'admin') renderProjector();
+                if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                    if (!isLocked) {
+                        optionBtns.forEach(b => b.disabled = false);
+                        lockBtn.disabled = true;
+                        playerStatus.textContent = 'No round started yet.';
+                        playerStatus.className = 'status-msg';
+                    }
+                }
+                return;
+            }
+            const data = docSnap.data();
+            const locks = data.locks || {};
+            const correct = data.correctOption || null;
+            lockData = locks;
+            correctOption = correct;
+
+            // Update player UI if in options view
+            if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                const myLock = currentUser ? locks[currentUser.uid] : null;
+                if (myLock) {
+                    // Player has locked
+                    if (!isLocked) {
+                        isLocked = true;
+                        selectedOption = myLock.option;
+                        optionBtns.forEach(b => {
+                            b.disabled = true;
+                            if (b.dataset.option === selectedOption) b.classList.add('selected');
+                        });
+                        lockBtn.disabled = true;
+                        lockBtn.textContent = '✅ Locked';
+                        lockBtn.classList.add('locked');
+                        playerStatus.textContent = `You locked ${selectedOption}`;
+                        playerStatus.className = 'status-msg success';
+                    }
+                    // If correctOption is set, show feedback
+                    if (correctOption && !hasShownFeedback) {
+                        revealFeedback(myLock.option);
+                    }
+                } else {
+                    // Player not locked yet
+                    if (correctOption) {
+                        // Answer revealed, disable locking
+                        optionBtns.forEach(b => b.disabled = true);
+                        lockBtn.disabled = true;
+                        lockBtn.textContent = '🔒 Locked (Answer Revealed)';
+                        lockBtn.classList.add('revealed');
+                        playerStatus.textContent = 'Answer already revealed.';
+                        playerStatus.className = 'status-msg warning';
+                    } else {
+                        // No correct option yet, allow locking
+                        if (!isLocked) {
+                            optionBtns.forEach(b => b.disabled = false);
+                            if (selectedOption) lockBtn.disabled = false;
+                            playerStatus.textContent = selectedOption ? `Selected: ${selectedOption}` : 'Select an option';
+                            playerStatus.className = 'status-msg';
+                        }
+                    }
+                }
+            }
+
+            // Admin view
+            if (currentMode === 'admin') {
+                renderProjector();
+            }
+        }, (error) => {
+            console.error('Listener error:', error);
+        });
+    }
+
+    // --------------------------------------------------------------
+    // 🖥️ Render Projector (Kahoot‑style with correct option highlight)
+    // --------------------------------------------------------------
+    let previousLockKeys = new Set();
+
+    function renderProjector() {
+        const entries = Object.values(lockData);
+        const total = entries.length;
+        totalCount.textContent = total;
+        const locked = entries.filter(e => e.option).length;
+        lockedCount.textContent = locked;
+
+        // Detect new locks for notification
+        const currentKeys = new Set(Object.keys(lockData));
+        const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
+        if (newKeys.length > 0) {
+            const newestId = newKeys[newKeys.length - 1];
+            const newEntry = lockData[newestId];
+            if (newEntry) {
+                notifName.textContent = newEntry.playerName || 'Player';
+                notifOption.textContent = newEntry.option || '?';
+                notifDiv.classList.add('active');
+                playAdminNotification();
+                if (notifTimeout) clearTimeout(notifTimeout);
+                notifTimeout = setTimeout(() => {
+                    notifDiv.classList.remove('active');
+                    notifTimeout = null;
+                }, 3000);
+            }
+        }
+        previousLockKeys = new Set(Object.keys(lockData));
+
+        // Group by option
+        const groups = { A: [], B: [], C: [], D: [] };
+        entries.forEach(entry => {
+            const opt = entry.option || '—';
+            if (groups[opt]) groups[opt].push(entry);
+            else groups[opt] = [entry];
+        });
+
+        // Build the grid
+        let html = '';
+        OPTIONS.forEach(opt => {
+            const players = groups[opt] || [];
+            const count = players.length;
+            const color = OPTION_COLORS[opt] || '#94a3b8';
+            const isCorrect = (correctOption === opt);
+            const correctClass = isCorrect ? 'correct-option' : '';
+            const nameList = players.map(p => 
+                `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
+            ).join('');
+
+            html += `
+                <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
+                    <div class="col-header" style="background: ${color};">${opt}</div>
+                    <div class="col-count">${count} player${count !== 1 ? 's' : ''}</div>
+                    ${count > 0 ? nameList : '<div class="empty-col">—</div>'}
+                </div>
+            `;
+        });
+
+        if (total === 0) {
+            html = '<div style="grid-column:1/-1; text-align:center; color:#475569; padding:40px; font-size:1.5rem;">No players yet...</div>';
+        }
+        projectorGrid.innerHTML = html;
+
+        // Attach click listeners to each column (admin only)
+        document.querySelectorAll('.option-column').forEach(col => {
+            col.addEventListener('click', () => {
+                if (currentMode !== 'admin') return;
+                const opt = col.dataset.option;
+                if (opt) {
+                    // Toggle correct option: if already correct, clear it; else set it
+                    const newCorrect = (correctOption === opt) ? null : opt;
+                    updateCorrectOption(newCorrect);
+                }
+            });
+        });
+    }
+
+    // --------------------------------------------------------------
+    // Admin: Update correct option in Firestore
+    // --------------------------------------------------------------
+    async function updateCorrectOption(option) {
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            await setDoc(roomRef, { correctOption: option }, { merge: true });
+            // The listener will update all clients
+        } catch (error) {
+            console.error('Update correct option error:', error);
+            alert('Failed to set correct option: ' + error.message);
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Admin: Clear correct option (button)
+    // --------------------------------------------------------------
+    clearCorrectBtn.addEventListener('click', async () => {
+        if (!confirm('Clear the correct answer? Players will no longer see feedback.')) return;
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            await setDoc(roomRef, { correctOption: null }, { merge: true });
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+
+    // --------------------------------------------------------------
+    // Admin: New Round / End Quiz
+    // --------------------------------------------------------------
+    async function newRound() {
+        if (!confirm('This will clear all current locks and correct answer. Continue?')) return;
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            await setDoc(roomRef, { locks: {}, roundStart: Timestamp.now(), correctOption: null }, { merge: true });
+            alert('New round started!');
+            if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
+            previousLockKeys = new Set();
+            // Reset player state if they are in options view
+            if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                // Reset local state
+                isLocked = false;
+                hasShownFeedback = false;
+                selectedOption = null;
+                optionBtns.forEach(b => {
+                    b.classList.remove('selected', 'blink-green', 'blink-red');
+                    b.style.borderColor = '';
+                    b.style.background = '';
+                    b.disabled = false;
+                });
+                lockBtn.disabled = true;
+                lockBtn.textContent = '🔒 Lock';
+                lockBtn.classList.remove('locked', 'revealed');
+                playerStatus.textContent = 'Select an option';
+                playerStatus.className = 'status-msg';
+                // If name already entered, just reset UI
+            }
+        } catch (error) {
+            alert('Failed: ' + error.message);
+        }
+    }
+
+    async function endQuiz() {
+        if (!confirm('This will clear ALL data (including past rounds). Are you sure?')) return;
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            await setDoc(roomRef, { locks: {}, roundStart: null, correctOption: null }, { merge: true });
+            alert('Quiz ended. All data cleared.');
+            if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
+            previousLockKeys = new Set();
+            // Reset player UI
+            if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                isLocked = false;
+                hasShownFeedback = false;
+                selectedOption = null;
+                optionBtns.forEach(b => {
+                    b.classList.remove('selected', 'blink-green', 'blink-red');
+                    b.style.borderColor = '';
+                    b.style.background = '';
+                    b.disabled = false;
+                });
+                lockBtn.disabled = true;
+                lockBtn.textContent = '🔒 Lock';
+                lockBtn.classList.remove('locked', 'revealed');
+                playerStatus.textContent = 'Select an option';
+                playerStatus.className = 'status-msg';
+            }
+        } catch (error) {
+            alert('Failed: ' + error.message);
+        }
+    }
+
+    resetBtn.addEventListener('click', newRound);
+    endQuizBtn.addEventListener('click', endQuiz);
+    refreshBtn.addEventListener('click', () => { connectToRoom(ROOM_ID); });
+
+    // --------------------------------------------------------------
+    // Initial load
+    // --------------------------------------------------------------
+    console.log('Quiz Lock System with Correct Answer & Feedback Loaded');
+
+    window.addEventListener('beforeunload', () => {
+        if (unsubscribeSnapshot) unsubscribeSnapshot();
+        if (notifTimeout) clearTimeout(notifTimeout);
+    });
+</script>
+</body>
+</html>
