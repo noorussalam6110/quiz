@@ -266,7 +266,7 @@
             transform: scale(0.95);
         }
 
-        /* Blink animations for player feedback */
+        /* Blink animations */
         @keyframes blinkGreen {
             0% { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px #22c55e; }
             25% { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 10px #22c55e; }
@@ -349,7 +349,7 @@
         .status-msg.error { color: #f87171; }
 
         /* ============================================================ */
-        /* ADMIN VIEW – Kahoot‑Style Projector */
+        /* ADMIN VIEW – Kahoot‑Style Projector (Toggleable Views) */
         /* ============================================================ */
         #adminView {
             display: none;
@@ -391,13 +391,19 @@
             margin-top: 2px;
         }
 
-        /* Kahoot‑style grid */
-        .projector-grid {
+        /* --- Display Area (shared) --- */
+        .admin-display-area {
             flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        /* ---- View 1: Group View (columns) ---- */
+        .projector-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            padding: 20px 10px;
+            padding: 10px;
             align-content: start;
         }
         .option-column {
@@ -458,19 +464,14 @@
             0% { opacity: 0; transform: translateY(-10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
-        /* Option colors */
         .option-column.col-A .col-header { background: #22c55e; }
         .option-column.col-B .col-header { background: #3b82f6; }
         .option-column.col-C .col-header { background: #eab308; }
         .option-column.col-D .col-header { background: #ef4444; }
-
         .option-column.col-A { border-top: 6px solid #22c55e; }
         .option-column.col-B { border-top: 6px solid #3b82f6; }
         .option-column.col-C { border-top: 6px solid #eab308; }
         .option-column.col-D { border-top: 6px solid #ef4444; }
-
-        /* When an option is marked correct – highlight the column */
         .option-column.correct-option {
             border: 4px solid #facc15;
             box-shadow: 0 0 40px rgba(250, 204, 21, 0.3);
@@ -479,7 +480,6 @@
         .option-column.correct-option .col-header {
             box-shadow: 0 0 60px rgba(250, 204, 21, 0.5);
         }
-
         .empty-col {
             color: #475569;
             font-size: 0.9rem;
@@ -488,7 +488,79 @@
             font-style: italic;
         }
 
-        /* Admin controls */
+        /* ---- View 2: Player List View (each person individually) ---- */
+        .player-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            padding: 10px;
+            align-content: start;
+        }
+        .player-list-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 3px solid #334155;
+            transition: all 0.3s ease;
+            animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        @keyframes cardIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .player-list-card .pl-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+        .player-list-card .pl-option {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #facc15;
+            text-shadow: 0 0 30px rgba(250, 204, 21, 0.2);
+            line-height: 1;
+            min-height: 5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .player-list-card .pl-time {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        /* Option-specific colors for list cards */
+        .player-list-card .pl-option.opt-A { color: #22c55e; text-shadow: 0 0 30px rgba(34,197,94,0.3); }
+        .player-list-card .pl-option.opt-B { color: #3b82f6; text-shadow: 0 0 30px rgba(59,130,246,0.3); }
+        .player-list-card .pl-option.opt-C { color: #eab308; text-shadow: 0 0 30px rgba(234,179,8,0.3); }
+        .player-list-card .pl-option.opt-D { color: #ef4444; text-shadow: 0 0 30px rgba(239,68,68,0.3); }
+        /* Correct/Wrong states in list view */
+        .player-list-card.card-correct {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.1);
+        }
+        .player-list-card.card-wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.1);
+        }
+        .player-list-card .pl-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .player-list-card .pl-status.status-correct { color: #22c55e; }
+        .player-list-card .pl-status.status-wrong { color: #ef4444; }
+
+        /* ---- Admin Controls ---- */
         .admin-actions {
             display: flex;
             gap: 12px;
@@ -504,10 +576,11 @@
             font-size: 0.9rem;
             cursor: pointer;
             flex: 1;
-            min-width: 100px;
+            min-width: 80px;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
             backdrop-filter: blur(4px);
+            text-align: center;
         }
         .admin-actions .btn-danger { background: #dc2626; color: white; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.2); }
         .admin-actions .btn-danger:hover { transform: scale(1.02); background: #b91c1c; }
@@ -521,6 +594,12 @@
             box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
         }
         .admin-actions .btn-clear-correct:hover { transform: scale(1.02); background: rgba(139, 92, 246, 0.6); }
+        .admin-actions .btn-toggle-view {
+            background: rgba(52, 211, 153, 0.3);
+            color: #6ee7b7;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.1);
+        }
+        .admin-actions .btn-toggle-view:hover { transform: scale(1.02); background: rgba(52, 211, 153, 0.5); }
 
         /* ----- Lock Notification (Admin) ----- */
         .lock-notification {
@@ -639,13 +718,12 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .projector-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                padding: 10px 5px;
-            }
+            .projector-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 5px; }
             .option-column .col-header { width: 50px; height: 50px; font-size: 2rem; }
             .option-column .player-name { font-size: 0.9rem; }
+            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .player-list-card .pl-option { font-size: 3rem; }
+            .player-list-card .pl-name { font-size: 1.1rem; }
         }
         @media (max-width: 480px) {
             .splash-title { font-size: 1.5rem; }
@@ -659,6 +737,10 @@
             .option-column .player-name { font-size: 0.8rem; padding: 2px 10px; }
             .lock-notification .lock-name { font-size: 3rem; }
             .lock-notification .lock-option { font-size: 5rem; }
+            .player-list-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .player-list-card .pl-option { font-size: 2.5rem; min-height: 3.5rem; }
+            .player-list-card .pl-name { font-size: 1rem; }
+            .admin-actions .btn { font-size: 0.7rem; padding: 10px 12px; min-width: 60px; }
         }
     </style>
 </head>
@@ -735,8 +817,8 @@
             <div class="admin-stat-card"><label>Locked</label><span id="lockedCount">0</span></div>
         </div>
 
-        <div class="projector-grid" id="projectorGrid">
-            <!-- will be populated by JS -->
+        <div class="admin-display-area" id="adminDisplayArea">
+            <!-- Rendered by JavaScript -->
         </div>
 
         <div class="admin-actions">
@@ -744,9 +826,10 @@
             <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
             <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
             <button class="btn btn-clear-correct" id="clearCorrectBtn">✕ Clear Correct</button>
+            <button class="btn btn-toggle-view" id="toggleViewBtn">👥 List View</button>
         </div>
         <p style="color: #64748b; font-size: 0.55rem; text-align: center; margin-top: 4px; opacity:0.6;">
-            Click an option column (A/B/C/D) to mark it as correct. Players will see green/red blink.
+            Click an option column (A/B/C/D) to mark it as correct. Click "List View" to see each player individually.
         </p>
     </div>
 </div>
@@ -777,13 +860,11 @@
     // 🔊 Audio & Vibration
     // --------------------------------------------------------------
     let audioCtx = null;
-
     function getAudioContext() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         return audioCtx;
     }
-
     function playLockSound() {
         try {
             const ctx = getAudioContext();
@@ -800,7 +881,6 @@
             osc.stop(ctx.currentTime + 0.2);
         } catch (e) {}
     }
-
     function playAdminNotification() {
         try {
             const ctx = getAudioContext();
@@ -817,7 +897,6 @@
             osc.stop(ctx.currentTime + 0.25);
         } catch (e) {}
     }
-
     function triggerVibration() {
         if (navigator.vibrate) navigator.vibrate(200);
     }
@@ -852,10 +931,11 @@
     let playerName = '';
     let selectedOption = null;
     let isLocked = false;
-    let lockData = {};          // { uid: { playerName, option, timestamp } }
-    let correctOption = null;   // 'A', 'B', 'C', 'D' or null
+    let lockData = {};
+    let correctOption = null;
     let notifTimeout = null;
-    let hasShownFeedback = false; // to prevent multiple blink triggers
+    let hasShownFeedback = false;
+    let viewMode = 'group'; // 'group' or 'list'
 
     // --------------------------------------------------------------
     // DOM Elements
@@ -880,11 +960,12 @@
 
     const totalCount = document.getElementById('totalCount');
     const lockedCount = document.getElementById('lockedCount');
-    const projectorGrid = document.getElementById('projectorGrid');
+    const adminDisplayArea = document.getElementById('adminDisplayArea');
     const resetBtn = document.getElementById('resetBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
     const refreshBtn = document.getElementById('refreshBtn');
     const clearCorrectBtn = document.getElementById('clearCorrectBtn');
+    const toggleViewBtn = document.getElementById('toggleViewBtn');
 
     const notifDiv = document.getElementById('lockNotification');
     const notifName = document.getElementById('notifName');
@@ -903,12 +984,13 @@
             localStorage.setItem('quizPlayerName', name);
             setupView.classList.add('hidden');
             optionsView.classList.add('active');
-            // Reset selection
             selectedOption = null;
             isLocked = false;
             hasShownFeedback = false;
             optionBtns.forEach(b => {
                 b.classList.remove('selected', 'blink-green', 'blink-red');
+                b.style.borderColor = '';
+                b.style.background = '';
                 b.disabled = false;
             });
             lockBtn.disabled = true;
@@ -916,7 +998,6 @@
             lockBtn.classList.remove('locked', 'revealed');
             playerStatus.textContent = 'Select an option';
             playerStatus.className = 'status-msg';
-            // If already locked in this round, show status
             if (currentUser && lockData[currentUser.uid]) {
                 const existing = lockData[currentUser.uid];
                 isLocked = true;
@@ -930,21 +1011,15 @@
                 lockBtn.classList.add('locked');
                 playerStatus.textContent = `You locked ${selectedOption}`;
                 playerStatus.className = 'status-msg success';
-                // If correct answer already revealed, show feedback
-                if (correctOption) {
-                    revealFeedback(selectedOption);
-                }
+                if (correctOption) revealFeedback(selectedOption);
             }
-            // If correct answer already set, show status and disable locks
             if (correctOption) {
-                // Disable locking for new players
                 optionBtns.forEach(b => b.disabled = true);
                 lockBtn.disabled = true;
                 lockBtn.textContent = '🔒 Locked (Answer Revealed)';
                 lockBtn.classList.add('revealed');
                 playerStatus.textContent = 'Answer already revealed.';
                 playerStatus.className = 'status-msg warning';
-                // If player hasn't locked, they can't lock now
             }
         } else {
             playerNameInput.focus();
@@ -970,7 +1045,7 @@
     optionBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             if (isLocked) return;
-            if (correctOption) return; // cannot change after reveal
+            if (correctOption) return;
             const opt = btn.dataset.option;
             optionBtns.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
@@ -1010,18 +1085,17 @@
 
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
-            const result = await runTransaction(db, async (transaction) => {
+            await runTransaction(db, async (transaction) => {
                 const docSnap = await transaction.get(roomRef);
                 if (!docSnap.exists()) {
                     transaction.set(roomRef, { locks: {}, roundStart: Timestamp.now() });
-                    return { success: true };
+                    return;
                 }
                 const data = docSnap.data();
                 const locks = data.locks || {};
                 if (locks[currentUser.uid]) {
                     throw new Error('Already locked');
                 }
-                // If correctOption is already set, prevent new locks
                 if (data.correctOption) {
                     throw new Error('Answer already revealed');
                 }
@@ -1032,22 +1106,11 @@
                     timestamp: Timestamp.now()
                 };
                 transaction.update(roomRef, { locks: newLocks });
-                return { success: true };
             });
 
-            if (result.success) {
-                isLocked = true;
-                lockBtn.textContent = '✅ Locked';
-                lockBtn.classList.add('locked');
-                playerStatus.textContent = `You locked ${selectedOption}`;
-                playerStatus.className = 'status-msg success';
-                playLockSound();
-                triggerVibration();
-                // If correct option was set during transaction (unlikely, but handle)
-                if (correctOption) {
-                    revealFeedback(selectedOption);
-                }
-            }
+            // Success (listener will update UI)
+            // The listener will call updatePlayerLockState
+
         } catch (error) {
             console.error('Lock error:', error);
             let msg = error.message;
@@ -1072,7 +1135,6 @@
                 lockBtn.disabled = true;
                 isLocked = true;
             } else {
-                // allow retry
                 lockBtn.disabled = false;
                 optionBtns.forEach(b => b.disabled = false);
                 if (selectedOption) {
@@ -1083,26 +1145,21 @@
     });
 
     // --------------------------------------------------------------
-    // 🟢🔴 Player Feedback function (blink)
+    // 🟢🔴 Player Feedback
     // --------------------------------------------------------------
     function revealFeedback(playerOption) {
         if (!correctOption) return;
-        // Only show feedback if player has locked
         if (!isLocked) return;
-        // Avoid repeated triggers
         if (hasShownFeedback) return;
         hasShownFeedback = true;
 
         const isCorrect = playerOption === correctOption;
         const blinkClass = isCorrect ? 'blink-green' : 'blink-red';
-        // Find the button corresponding to the player's option
         const btn = document.querySelector(`.option-btn[data-option="${playerOption}"]`);
         if (btn) {
             btn.classList.add(blinkClass);
-            // Remove classes after animation ends (4 blinks ~ 3.2s)
             setTimeout(() => {
                 btn.classList.remove(blinkClass);
-                // Keep a persistent indication
                 if (isCorrect) {
                     btn.style.borderColor = '#22c55e';
                     btn.style.background = 'rgba(34, 197, 94, 0.2)';
@@ -1112,7 +1169,6 @@
                 }
             }, 3200);
         }
-        // Update status message
         if (isCorrect) {
             playerStatus.textContent = '✅ Correct!';
             playerStatus.className = 'status-msg success';
@@ -1224,11 +1280,10 @@
             lockData = locks;
             correctOption = correct;
 
-            // Update player UI if in options view
+            // Update Player UI
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 const myLock = currentUser ? locks[currentUser.uid] : null;
                 if (myLock) {
-                    // Player has locked
                     if (!isLocked) {
                         isLocked = true;
                         selectedOption = myLock.option;
@@ -1242,14 +1297,11 @@
                         playerStatus.textContent = `You locked ${selectedOption}`;
                         playerStatus.className = 'status-msg success';
                     }
-                    // If correctOption is set, show feedback
                     if (correctOption && !hasShownFeedback) {
                         revealFeedback(myLock.option);
                     }
                 } else {
-                    // Player not locked yet
                     if (correctOption) {
-                        // Answer revealed, disable locking
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
                         lockBtn.textContent = '🔒 Locked (Answer Revealed)';
@@ -1257,7 +1309,6 @@
                         playerStatus.textContent = 'Answer already revealed.';
                         playerStatus.className = 'status-msg warning';
                     } else {
-                        // No correct option yet, allow locking
                         if (!isLocked) {
                             optionBtns.forEach(b => b.disabled = false);
                             if (selectedOption) lockBtn.disabled = false;
@@ -1278,7 +1329,7 @@
     }
 
     // --------------------------------------------------------------
-    // 🖥️ Render Projector (Kahoot‑style with correct option highlight)
+    // 🖥️ Render Projector (Toggleable Views)
     // --------------------------------------------------------------
     let previousLockKeys = new Set();
 
@@ -1289,7 +1340,7 @@
         const locked = entries.filter(e => e.option).length;
         lockedCount.textContent = locked;
 
-        // Detect new locks for notification
+        // Notification for new locks
         const currentKeys = new Set(Object.keys(lockData));
         const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
         if (newKeys.length > 0) {
@@ -1309,62 +1360,102 @@
         }
         previousLockKeys = new Set(Object.keys(lockData));
 
-        // Group by option
-        const groups = { A: [], B: [], C: [], D: [] };
-        entries.forEach(entry => {
-            const opt = entry.option || '—';
-            if (groups[opt]) groups[opt].push(entry);
-            else groups[opt] = [entry];
+        // Sort entries by time (oldest first)
+        const sortedEntries = [...entries].sort((a, b) => {
+            const ta = a.timestamp?.seconds || 0;
+            const tb = b.timestamp?.seconds || 0;
+            return ta - tb;
         });
 
-        // Build the grid
         let html = '';
-        OPTIONS.forEach(opt => {
-            const players = groups[opt] || [];
-            const count = players.length;
-            const color = OPTION_COLORS[opt] || '#94a3b8';
-            const isCorrect = (correctOption === opt);
-            const correctClass = isCorrect ? 'correct-option' : '';
-            const nameList = players.map(p => 
-                `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
-            ).join('');
 
-            html += `
-                <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
-                    <div class="col-header" style="background: ${color};">${opt}</div>
-                    <div class="col-count">${count} player${count !== 1 ? 's' : ''}</div>
-                    ${count > 0 ? nameList : '<div class="empty-col">—</div>'}
-                </div>
-            `;
-        });
-
-        if (total === 0) {
-            html = '<div style="grid-column:1/-1; text-align:center; color:#475569; padding:40px; font-size:1.5rem;">No players yet...</div>';
-        }
-        projectorGrid.innerHTML = html;
-
-        // Attach click listeners to each column (admin only)
-        document.querySelectorAll('.option-column').forEach(col => {
-            col.addEventListener('click', () => {
-                if (currentMode !== 'admin') return;
-                const opt = col.dataset.option;
-                if (opt) {
-                    // Toggle correct option: if already correct, clear it; else set it
-                    const newCorrect = (correctOption === opt) ? null : opt;
-                    updateCorrectOption(newCorrect);
-                }
+        if (viewMode === 'group') {
+            // ---- GROUP VIEW (Columns) ----
+            const groups = { A: [], B: [], C: [], D: [] };
+            sortedEntries.forEach(entry => {
+                const opt = entry.option || '—';
+                if (groups[opt]) groups[opt].push(entry);
+                else groups[opt] = [entry];
             });
-        });
+
+            html = '<div class="projector-grid">';
+            OPTIONS.forEach(opt => {
+                const players = groups[opt] || [];
+                const count = players.length;
+                const color = OPTION_COLORS[opt] || '#94a3b8';
+                const isCorrect = (correctOption === opt);
+                const correctClass = isCorrect ? 'correct-option' : '';
+                const nameList = players.map(p => 
+                    `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
+                ).join('');
+
+                html += `
+                    <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
+                        <div class="col-header" style="background: ${color};">${opt}</div>
+                        <div class="col-count">${count} player${count !== 1 ? 's' : ''}</div>
+                        ${count > 0 ? nameList : '<div class="empty-col">—</div>'}
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // Attach click listeners for correct answer (group view)
+            setTimeout(() => {
+                document.querySelectorAll('.option-column').forEach(col => {
+                    col.addEventListener('click', () => {
+                        if (currentMode !== 'admin') return;
+                        const opt = col.dataset.option;
+                        if (opt) {
+                            const newCorrect = (correctOption === opt) ? null : opt;
+                            updateCorrectOption(newCorrect);
+                        }
+                    });
+                });
+            }, 50);
+
+            toggleViewBtn.textContent = '👥 List View';
+
+        } else {
+            // ---- LIST VIEW (Each player individually) ----
+            if (sortedEntries.length === 0) {
+                html = '<div style="text-align:center; color:#475569; padding:40px; grid-column:1/-1;">No players yet...</div>';
+            } else {
+                html = '<div class="player-list-grid">';
+                sortedEntries.forEach(entry => {
+                    const name = entry.playerName || 'Anonymous';
+                    const opt = entry.option || '—';
+                    const time = entry.timestamp?.seconds ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString('en-IN', { hour12: false }) : '--:--';
+                    const isCorrect = (correctOption && opt === correctOption);
+                    const isWrong = (correctOption && opt !== '—' && opt !== correctOption);
+                    let statusClass = '';
+                    let statusText = '';
+                    if (isCorrect) { statusClass = 'card-correct'; statusText = '✅ Correct'; }
+                    else if (isWrong) { statusClass = 'card-wrong'; statusText = '❌ Wrong'; }
+                    const optClass = `opt-${opt}`;
+                    html += `
+                        <div class="player-list-card ${statusClass}">
+                            <div class="pl-name">${name}</div>
+                            <div class="pl-option ${optClass}">${opt}</div>
+                            ${statusText ? `<div class="pl-status ${statusClass}">${statusText}</div>` : ''}
+                            <div class="pl-time">⏱ ${time}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            toggleViewBtn.textContent = '📊 Group View';
+        }
+
+        adminDisplayArea.innerHTML = html;
     }
 
     // --------------------------------------------------------------
-    // Admin: Update correct option in Firestore
+    // Admin: Update correct option
     // --------------------------------------------------------------
     async function updateCorrectOption(option) {
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { correctOption: option }, { merge: true });
-            // The listener will update all clients
         } catch (error) {
             console.error('Update correct option error:', error);
             alert('Failed to set correct option: ' + error.message);
@@ -1372,7 +1463,15 @@
     }
 
     // --------------------------------------------------------------
-    // Admin: Clear correct option (button)
+    // Toggle View
+    // --------------------------------------------------------------
+    toggleViewBtn.addEventListener('click', () => {
+        viewMode = (viewMode === 'group') ? 'list' : 'group';
+        renderProjector();
+    });
+
+    // --------------------------------------------------------------
+    // Admin: Clear correct option
     // --------------------------------------------------------------
     clearCorrectBtn.addEventListener('click', async () => {
         if (!confirm('Clear the correct answer? Players will no longer see feedback.')) return;
@@ -1395,9 +1494,7 @@
             alert('New round started!');
             if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
             previousLockKeys = new Set();
-            // Reset player state if they are in options view
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
-                // Reset local state
                 isLocked = false;
                 hasShownFeedback = false;
                 selectedOption = null;
@@ -1412,7 +1509,6 @@
                 lockBtn.classList.remove('locked', 'revealed');
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
-                // If name already entered, just reset UI
             }
         } catch (error) {
             alert('Failed: ' + error.message);
@@ -1427,7 +1523,6 @@
             alert('Quiz ended. All data cleared.');
             if (notifDiv.classList.contains('active')) notifDiv.classList.remove('active');
             previousLockKeys = new Set();
-            // Reset player UI
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 isLocked = false;
                 hasShownFeedback = false;
@@ -1456,7 +1551,7 @@
     // --------------------------------------------------------------
     // Initial load
     // --------------------------------------------------------------
-    console.log('Quiz Lock System with Correct Answer & Feedback Loaded');
+    console.log('Quiz Lock System – with Toggleable Admin Views (Group / Player List)');
 
     window.addEventListener('beforeunload', () => {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
