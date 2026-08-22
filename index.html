@@ -56,7 +56,6 @@
             overflow: hidden;
         }
 
-        /* ----- Header (Admin only) ----- */
         .header {
             display: flex;
             justify-content: space-between;
@@ -363,7 +362,7 @@
         .status-msg.error { color: #f87171; }
 
         /* ============================================================ */
-        /* ADMIN VIEW (with all controls) */
+        /* ADMIN VIEW */
         /* ============================================================ */
         #adminView {
             display: none;
@@ -411,7 +410,6 @@
             padding: 10px 0;
         }
 
-        /* Group View */
         .projector-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -493,7 +491,6 @@
         }
         .empty-col { color: #475569; font-size: 0.9rem; padding: 20px; text-align: center; font-style: italic; }
 
-        /* Player List View */
         .player-list-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -531,7 +528,6 @@
         .player-list-card .pl-status.status-correct { color: #22c55e; }
         .player-list-card .pl-status.status-wrong { color: #ef4444; }
 
-        /* Admin controls */
         .admin-actions {
             display: flex;
             gap: 12px;
@@ -584,7 +580,7 @@
         .admin-actions .btn-stop-locking:hover { transform: scale(1.02); background: linear-gradient(135deg, #dc2626, #b91c1c); }
 
         /* ============================================================ */
-        /* PROJECTOR OVERLAY – Dramatic Big Screen */
+        /* PROJECTOR OVERLAY */
         /* ============================================================ */
         .projector-overlay {
             position: fixed;
@@ -601,7 +597,6 @@
         }
         .projector-overlay.active { display: flex; }
 
-        /* Animated background */
         .projector-overlay::before {
             content: '';
             position: absolute;
@@ -622,7 +617,6 @@
             100% { transform: translate(-10%, -10%) scale(1.2); }
         }
 
-        /* Particle canvas */
         #projectorParticles {
             position: absolute;
             top: 0;
@@ -671,7 +665,6 @@
             font-weight: 700;
         }
 
-        /* Timer on projector – big and dramatic */
         .projector-timer {
             text-align: center;
             font-size: 5rem;
@@ -700,7 +693,6 @@
             z-index: 1;
         }
 
-        /* Projector uses same grid/list styles as admin, but with larger fonts */
         .projector-body .projector-grid {
             grid-template-columns: repeat(4, 1fr);
             gap: 30px;
@@ -829,7 +821,6 @@
 
         .admin-toggle.mobile-hidden { display: none !important; }
 
-        /* Scrollbars */
         .admin-display-area::-webkit-scrollbar,
         .projector-body::-webkit-scrollbar { width: 4px; }
         .admin-display-area::-webkit-scrollbar-thumb,
@@ -837,7 +828,6 @@
         .admin-display-area::-webkit-scrollbar-track,
         .projector-body::-webkit-scrollbar-track { background: transparent; }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .projector-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
             .option-column .col-header { width: 50px; height: 50px; font-size: 2rem; }
@@ -1070,7 +1060,8 @@
     let roundStart = null;
     let timerInterval = null;
     let isTimeUp = false;
-    let roundEnded = false; // manual stop
+    let roundEnded = false;
+    let prevRoundStart = null; // to detect new round
 
     // --------------------------------------------------------------
     // DOM Elements
@@ -1180,7 +1171,7 @@
             }
         } else {
             isTimeUp = false;
-            if (!isLocked && !correctOption && currentMode === 'player' && optionsView.classList.contains('active')) {
+            if (!isLocked && !correctOption && currentMode === 'player' && optionsView.classList.contains('active') && roundStart) {
                 optionBtns.forEach(b => b.disabled = false);
                 if (selectedOption) lockBtn.disabled = false;
                 if (!lockBtn.classList.contains('locked')) {
@@ -1205,7 +1196,6 @@
             clearInterval(timerInterval);
             timerInterval = null;
         }
-        // Don't reset display here; let updateTimerDisplay handle it
     }
 
     function forceStopLocking() {
@@ -1222,7 +1212,6 @@
             playerStatus.textContent = 'Locking has been stopped by admin.';
             playerStatus.className = 'status-msg error';
         }
-        // Update projector if open
         if (projectorOverlay.classList.contains('active')) {
             updateTimerDisplay();
         }
@@ -1304,22 +1293,9 @@
             localStorage.setItem('quizPlayerName', name);
             setupView.classList.add('hidden');
             optionsView.classList.add('active');
-            selectedOption = null;
-            isLocked = false;
-            hasShownFeedback = false;
-            isTimeUp = false;
-            roundEnded = false;
-            optionBtns.forEach(b => {
-                b.classList.remove('selected', 'blink-green', 'blink-red');
-                b.style.borderColor = '';
-                b.style.background = '';
-                b.disabled = false;
-            });
-            lockBtn.disabled = true;
-            lockBtn.textContent = '🔒 Lock';
-            lockBtn.classList.remove('locked', 'revealed');
-            playerStatus.textContent = 'Select an option';
-            playerStatus.className = 'status-msg';
+            // Reset local state when entering options view
+            resetPlayerState();
+            // Check if user already locked, etc.
             if (currentUser && lockData[currentUser.uid]) {
                 const existing = lockData[currentUser.uid];
                 isLocked = true;
@@ -1368,6 +1344,30 @@
     if (savedName) {
         playerNameInput.value = savedName.toUpperCase();
         playerName = savedName.toUpperCase();
+    }
+
+    // --------------------------------------------------------------
+    // 🧹 Reset Player State (for new round)
+    // --------------------------------------------------------------
+    function resetPlayerState() {
+        isLocked = false;
+        hasShownFeedback = false;
+        selectedOption = null;
+        isTimeUp = false;
+        roundEnded = false;
+        // Reset UI
+        optionBtns.forEach(b => {
+            b.classList.remove('selected', 'blink-green', 'blink-red');
+            b.style.borderColor = '';
+            b.style.background = '';
+            b.disabled = false;
+        });
+        lockBtn.disabled = true;
+        lockBtn.textContent = '🔒 Lock';
+        lockBtn.classList.remove('locked', 'revealed');
+        playerStatus.textContent = 'Select an option';
+        playerStatus.className = 'status-msg';
+        // Keep timer display as is – will be updated by timer interval
     }
 
     // --------------------------------------------------------------
@@ -1584,7 +1584,7 @@
     });
 
     // --------------------------------------------------------------
-    // Firestore Listener
+    // 🔗 Firestore Listener (with auto‑reset on new round)
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1594,6 +1594,7 @@
                 lockData = {};
                 correctOption = null;
                 roundStart = null;
+                prevRoundStart = null;
                 stopTimer();
                 if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
@@ -1613,15 +1614,26 @@
             const start = data.roundStart || null;
             lockData = locks;
             correctOption = correct;
+
+            // 🔄 Detect new round: roundStart changed and is not null
+            const newRoundStarted = (start !== null && prevRoundStart !== null && start.seconds !== prevRoundStart.seconds);
+            if (newRoundStarted) {
+                // Reset player state for new round
+                if (currentMode === 'player' && optionsView.classList.contains('active') && !lockData[currentUser?.uid]) {
+                    // Only reset if player is not locked in this new round
+                    resetPlayerState();
+                }
+            }
+            prevRoundStart = start;
             roundStart = start;
 
+            // Timer management
             if (roundStart && !roundEnded) {
                 if (!timerInterval) startTimer();
             } else if (!roundStart) {
                 stopTimer();
                 isTimeUp = false;
                 roundEnded = false;
-                // Reset timer display
                 if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
                 if (projectorTimer) { projectorTimer.textContent = '⏱ --'; projectorTimer.className = 'projector-timer'; }
             }
@@ -1630,6 +1642,7 @@
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 const myLock = currentUser ? locks[currentUser.uid] : null;
                 if (myLock) {
+                    // Player is locked
                     if (!isLocked) {
                         isLocked = true;
                         selectedOption = myLock.option;
@@ -1647,6 +1660,7 @@
                         revealFeedback(myLock.option);
                     }
                 } else {
+                    // Player not locked
                     if (correctOption) {
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
@@ -1662,6 +1676,7 @@
                         playerStatus.textContent = roundEnded ? 'Locking has been stopped.' : 'Time is up!';
                         playerStatus.className = 'status-msg error';
                     } else {
+                        // Round active, player can select
                         if (!isLocked) {
                             optionBtns.forEach(b => b.disabled = false);
                             if (selectedOption) lockBtn.disabled = false;
@@ -1672,8 +1687,15 @@
                 }
             }
 
+            // Admin view
             if (currentMode === 'admin') renderAdminView();
-            if (projectorOverlay.classList.contains('active')) renderProjector();
+
+            // Projector view
+            if (projectorOverlay.classList.contains('active')) {
+                renderProjector();
+                // Update timer if needed
+                updateTimerDisplay();
+            }
         }, (error) => {
             console.error('Listener error:', error);
         });
@@ -1901,26 +1923,9 @@
                 roundStart: Timestamp.now(),
                 correctOption: null
             }, { merge: true });
-            // Reset player state
-            if (currentMode === 'player' && optionsView.classList.contains('active')) {
-                isLocked = false;
-                hasShownFeedback = false;
-                selectedOption = null;
-                isTimeUp = false;
-                roundEnded = false;
-                optionBtns.forEach(b => {
-                    b.classList.remove('selected', 'blink-green', 'blink-red');
-                    b.style.borderColor = '';
-                    b.style.background = '';
-                    b.disabled = false;
-                });
-                lockBtn.disabled = true;
-                lockBtn.textContent = '🔒 Lock';
-                lockBtn.classList.remove('locked', 'revealed');
-                playerStatus.textContent = 'Select an option';
-                playerStatus.className = 'status-msg';
-            }
-            if (projectorOverlay.classList.contains('active')) renderProjector();
+            // The listener will detect new round and reset player states automatically.
+            // We don't need to manually reset here, but we can update the UI hints.
+            // Show alert for confirmation.
             alert(`Round started! ${LOCK_DURATION}s to lock.`);
         } catch (error) {
             alert('Failed to start round: ' + error.message);
@@ -1932,19 +1937,14 @@
     // --------------------------------------------------------------
     stopLockingBtn.addEventListener('click', async () => {
         if (!confirm('Stop locking immediately? Players will no longer be able to lock.')) return;
-        // Set roundEnded flag locally and in Firestore
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
-            // We set roundStart to a past timestamp to effectively end it, but we'll use a flag
-            // Since we don't have a separate field, we set roundStart to null and let the client handle the flag
-            // Actually, we can set roundStart to null and set a 'locked' state? We'll just use a flag.
-            // Better: set roundStart to null and let the client know it's ended.
-            // But we want to keep the locks, so we set roundStart to null (meaning no active round)
+            // Set roundStart to null to signal that the locking period has ended
             await setDoc(roomRef, { roundStart: null }, { merge: true });
-            // The listener will update the timer to show "Locking Stopped"
-            // Also force local state
+            // The listener will handle the UI update.
+            // Also force local stop to make it immediate.
             forceStopLocking();
-            alert('Locking stopped! Players cannot lock now.');
+            alert('Locking stopped!');
         } catch (error) {
             alert('Failed to stop locking: ' + error.message);
         }
@@ -1973,22 +1973,7 @@
             await setDoc(roomRef, { locks: {}, roundStart: null, correctOption: null }, { merge: true });
             alert('Quiz ended. All data cleared.');
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
-                isLocked = false;
-                hasShownFeedback = false;
-                selectedOption = null;
-                isTimeUp = false;
-                roundEnded = false;
-                optionBtns.forEach(b => {
-                    b.classList.remove('selected', 'blink-green', 'blink-red');
-                    b.style.borderColor = '';
-                    b.style.background = '';
-                    b.disabled = false;
-                });
-                lockBtn.disabled = true;
-                lockBtn.textContent = '🔒 Lock';
-                lockBtn.classList.remove('locked', 'revealed');
-                playerStatus.textContent = 'Select an option';
-                playerStatus.className = 'status-msg';
+                resetPlayerState();
                 stopTimer();
                 if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
             }
@@ -2020,7 +2005,7 @@
         }
     });
 
-    console.log('Quiz Lock System – with "Stop Locking" button loaded');
+    console.log('Quiz Lock System – with auto‑reset on new round');
 </script>
 </body>
 </html>
