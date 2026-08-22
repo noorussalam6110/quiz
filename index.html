@@ -195,7 +195,7 @@
             transform: none;
         }
 
-        /* ---- Options & Lock View ---- */
+        /* ---- Options & Timer View ---- */
         #optionsView {
             display: none;
             flex-direction: column;
@@ -218,6 +218,20 @@
         .options-header p {
             color: #94a3b8;
             font-size: 0.9rem;
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #facc15;
+            text-shadow: 0 0 30px rgba(250, 204, 21, 0.3);
+            padding: 8px 0;
+            flex-shrink: 0;
+        }
+        .timer-display.ended {
+            color: #ef4444;
+            text-shadow: 0 0 40px rgba(239, 68, 68, 0.4);
         }
 
         .options-grid {
@@ -549,7 +563,7 @@
         .admin-actions .btn-projector:hover { transform: scale(1.02); background: rgba(234,179,8,0.5); }
 
         /* ============================================================ */
-        /* PROJECTOR OVERLAY – Clean, button‑free big screen */
+        /* PROJECTOR OVERLAY – Dramatic Big Screen */
         /* ============================================================ */
         .projector-overlay {
             position: fixed;
@@ -558,10 +572,6 @@
             right: 0;
             bottom: 0;
             background: #0a0e1a;
-            background-image: 
-                radial-gradient(ellipse at 50% 80%, rgba(250,204,21,0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 20% 20%, rgba(74,222,128,0.04) 0%, transparent 50%),
-                linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -570,11 +580,44 @@
         }
         .projector-overlay.active { display: flex; }
 
+        /* Animated background */
+        .projector-overlay::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(250,204,21,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(74,222,128,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(139,92,246,0.04) 0%, transparent 50%);
+            animation: projectorBgAnim 20s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes projectorBgAnim {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(-10%, -10%) scale(1.2); }
+        }
+
+        /* Particle canvas */
+        #projectorParticles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .projector-header {
             text-align: center;
-            padding: 10px 0 20px;
+            padding: 10px 0 10px;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 1;
         }
         .projector-header h1 {
             color: #facc15;
@@ -594,6 +637,8 @@
             justify-content: center;
             padding: 10px 0;
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
         .projector-stats .stat-item {
             color: #f1f5f9;
@@ -605,10 +650,29 @@
             font-weight: 700;
         }
 
+        /* Timer on projector – big and dramatic */
+        .projector-timer {
+            text-align: center;
+            font-size: 5rem;
+            font-weight: 900;
+            color: #facc15;
+            text-shadow: 0 0 60px rgba(250,204,21,0.5);
+            padding: 5px 0;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        .projector-timer.ended {
+            color: #ef4444;
+            text-shadow: 0 0 80px rgba(239,68,68,0.6);
+        }
+
         .projector-body {
             flex: 1;
             overflow-y: auto;
             padding: 10px 0;
+            position: relative;
+            z-index: 1;
         }
 
         /* Projector uses same grid/list styles as admin, but with larger fonts */
@@ -764,6 +828,7 @@
             .projector-body .player-list-card .pl-option { font-size: 4rem; }
             .projector-header h1 { font-size: 1.8rem; }
             .projector-stats .stat-item { font-size: 1rem; }
+            .projector-timer { font-size: 3rem; }
         }
         @media (max-width: 480px) {
             .splash-title { font-size: 1.5rem; }
@@ -788,6 +853,7 @@
             .projector-header h1 { font-size: 1.4rem; }
             .projector-header .sub { font-size: 0.9rem; }
             .projector-stats .stat-item { font-size: 0.8rem; gap: 15px; }
+            .projector-timer { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -834,6 +900,8 @@
                 <h2>🔐 Choose your answer</h2>
                 <p>Tap an option then Lock</p>
             </div>
+            <!-- Timer -->
+            <div class="timer-display" id="playerTimer">⏱ 15s</div>
             <div class="options-grid">
                 <button class="option-btn" data-option="A">A</button>
                 <button class="option-btn" data-option="B">B</button>
@@ -847,7 +915,7 @@
         </div>
     </div>
 
-    <!-- Admin View (controls + preview) -->
+    <!-- Admin View -->
     <div id="adminView">
         <div class="admin-stats">
             <div class="admin-stat-card"><label>Total Players</label><span id="totalCount">0</span></div>
@@ -870,19 +938,21 @@
     </div>
 </div>
 
-<!-- Projector Overlay – clean, no buttons -->
+<!-- Projector Overlay -->
 <div class="projector-overlay" id="projectorOverlay">
+    <canvas id="projectorParticles"></canvas>
     <button class="projector-exit" id="projectorExitBtn">✕</button>
     <div class="projector-header">
         <h1>📊 NOORUSSALAM – MEGA QUIZ</h1>
         <div class="sub">Live Results</div>
     </div>
+    <div class="projector-timer" id="projectorTimer">⏱ 15s</div>
     <div class="projector-stats" id="projectorStats">
         <div class="stat-item">👥 Total: <span id="projTotal">0</span></div>
         <div class="stat-item">🔒 Locked: <span id="projLocked">0</span></div>
     </div>
     <div class="projector-body" id="projectorBody">
-        <!-- Rendered by JS (same content as admin, but larger and no interactivity) -->
+        <!-- Rendered by JS -->
     </div>
 </div>
 
@@ -957,6 +1027,7 @@
         'C': '#eab308',
         'D': '#ef4444'
     };
+    const LOCK_DURATION = 15; // seconds
 
     // --------------------------------------------------------------
     // State
@@ -971,6 +1042,9 @@
     let correctOption = null;
     let hasShownFeedback = false;
     let viewMode = 'group'; // 'group' or 'list'
+    let roundStart = null; // server timestamp
+    let timerInterval = null;
+    let isTimeUp = false;
 
     // --------------------------------------------------------------
     // DOM Elements
@@ -992,6 +1066,7 @@
     const optionBtns = document.querySelectorAll('.option-btn');
     const lockBtn = document.getElementById('lockBtn');
     const playerStatus = document.getElementById('playerStatus');
+    const playerTimer = document.getElementById('playerTimer');
 
     const totalCount = document.getElementById('totalCount');
     const lockedCount = document.getElementById('lockedCount');
@@ -1009,9 +1084,153 @@
     const projectorBody = document.getElementById('projectorBody');
     const projTotal = document.getElementById('projTotal');
     const projLocked = document.getElementById('projLocked');
+    const projectorTimer = document.getElementById('projectorTimer');
+    const particleCanvas = document.getElementById('projectorParticles');
+    const ctx = particleCanvas.getContext('2d');
 
     roomBadge.textContent = `Room: ${ROOM_ID}`;
     if (IS_MOBILE) adminToggleBtn.classList.add('mobile-hidden');
+
+    // --------------------------------------------------------------
+    // ⏱ Timer functions
+    // --------------------------------------------------------------
+    function getRemainingSeconds() {
+        if (!roundStart) return LOCK_DURATION;
+        const now = Timestamp.now();
+        const elapsed = (now.seconds - roundStart.seconds) + (now.nanoseconds - roundStart.nanoseconds) / 1e9;
+        const remaining = Math.max(0, LOCK_DURATION - elapsed);
+        return remaining;
+    }
+
+    function updateTimerDisplay() {
+        const remaining = getRemainingSeconds();
+        const seconds = Math.ceil(remaining);
+        const isEnded = seconds <= 0;
+        // Update player timer
+        if (playerTimer) {
+            if (isEnded) {
+                playerTimer.textContent = '⏱ Time\'s up!';
+                playerTimer.className = 'timer-display ended';
+            } else {
+                playerTimer.textContent = `⏱ ${seconds}s`;
+                playerTimer.className = 'timer-display';
+            }
+        }
+        // Update projector timer
+        if (projectorTimer) {
+            if (isEnded) {
+                projectorTimer.textContent = '⏱ TIME\'S UP!';
+                projectorTimer.className = 'projector-timer ended';
+            } else {
+                projectorTimer.textContent = `⏱ ${seconds}s`;
+                projectorTimer.className = 'projector-timer';
+            }
+        }
+        // Update lock availability
+        if (isEnded) {
+            isTimeUp = true;
+            if (!isLocked && currentMode === 'player' && optionsView.classList.contains('active')) {
+                // Disable locking and options
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                lockBtn.textContent = '⏰ Time\'s up';
+                lockBtn.classList.add('revealed');
+                playerStatus.textContent = 'Time is up! You cannot lock now.';
+                playerStatus.className = 'status-msg error';
+            }
+        } else {
+            isTimeUp = false;
+            // Only enable if not locked and no correct option revealed
+            if (!isLocked && !correctOption && currentMode === 'player' && optionsView.classList.contains('active')) {
+                optionBtns.forEach(b => b.disabled = false);
+                if (selectedOption) lockBtn.disabled = false;
+                // Revert lock button text if it was changed
+                if (!lockBtn.classList.contains('locked')) {
+                    lockBtn.textContent = '🔒 Lock';
+                    lockBtn.classList.remove('revealed');
+                }
+            }
+        }
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        updateTimerDisplay();
+        timerInterval = setInterval(updateTimerDisplay, 500);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    // --------------------------------------------------------------
+    // 🎨 Particle system for projector background
+    // --------------------------------------------------------------
+    let particles = [];
+    let particleRunning = false;
+    let particleAnimationId = null;
+
+    function initParticles() {
+        const canvas = particleCanvas;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        particles = [];
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1.5,
+                speedX: (Math.random() - 0.5) * 0.4,
+                speedY: (Math.random() - 0.5) * 0.4,
+                opacity: Math.random() * 0.5 + 0.2,
+                hue: Math.random() * 60 + 40 // golden/greenish
+            });
+        }
+        if (particleRunning) cancelAnimationFrame(particleAnimationId);
+        particleRunning = true;
+        animateParticles();
+    }
+
+    function animateParticles() {
+        if (!particleRunning) return;
+        ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        particles.forEach(p => {
+            p.x += p.speedX;
+            p.y += p.speedY;
+            if (p.x < 0) p.x = particleCanvas.width;
+            if (p.x > particleCanvas.width) p.x = 0;
+            if (p.y < 0) p.y = particleCanvas.height;
+            if (p.y > particleCanvas.height) p.y = 0;
+            p.opacity += (Math.random() - 0.5) * 0.02;
+            p.opacity = Math.min(0.8, Math.max(0.1, p.opacity));
+            p.size += (Math.random() - 0.5) * 0.1;
+            p.size = Math.min(4, Math.max(1.5, p.size));
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+            gradient.addColorStop(0, `hsla(${p.hue}, 80%, 70%, ${p.opacity})`);
+            gradient.addColorStop(0.5, `hsla(${p.hue + 30}, 80%, 50%, ${p.opacity * 0.5})`);
+            gradient.addColorStop(1, `hsla(${p.hue + 60}, 80%, 30%, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        });
+        particleAnimationId = requestAnimationFrame(animateParticles);
+    }
+
+    function resizeParticles() {
+        if (projectorOverlay.classList.contains('active')) {
+            const canvas = particleCanvas;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            particles.forEach(p => {
+                p.x = Math.random() * canvas.width;
+                p.y = Math.random() * canvas.height;
+            });
+        }
+    }
 
     // --------------------------------------------------------------
     // 📝 Enter Button Logic
@@ -1023,9 +1242,11 @@
             localStorage.setItem('quizPlayerName', name);
             setupView.classList.add('hidden');
             optionsView.classList.add('active');
+            // Reset selection and timer state
             selectedOption = null;
             isLocked = false;
             hasShownFeedback = false;
+            isTimeUp = false;
             optionBtns.forEach(b => {
                 b.classList.remove('selected', 'blink-green', 'blink-red');
                 b.style.borderColor = '';
@@ -1037,6 +1258,7 @@
             lockBtn.classList.remove('locked', 'revealed');
             playerStatus.textContent = 'Select an option';
             playerStatus.className = 'status-msg';
+            // Check if already locked or timer ended via listener
             if (currentUser && lockData[currentUser.uid]) {
                 const existing = lockData[currentUser.uid];
                 isLocked = true;
@@ -1052,6 +1274,15 @@
                 playerStatus.className = 'status-msg success';
                 if (correctOption) revealFeedback(selectedOption);
             }
+            // If timer already ended, disable lock
+            if (isTimeUp && !isLocked) {
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                lockBtn.textContent = '⏰ Time\'s up';
+                lockBtn.classList.add('revealed');
+                playerStatus.textContent = 'Time is up! You cannot lock now.';
+                playerStatus.className = 'status-msg error';
+            }
             if (correctOption) {
                 optionBtns.forEach(b => b.disabled = true);
                 lockBtn.disabled = true;
@@ -1060,6 +1291,8 @@
                 playerStatus.textContent = 'Answer already revealed.';
                 playerStatus.className = 'status-msg warning';
             }
+            // Start timer if not already started
+            if (!timerInterval) startTimer();
         } else {
             playerNameInput.focus();
             playerNameInput.style.borderColor = '#f87171';
@@ -1085,6 +1318,7 @@
         btn.addEventListener('click', () => {
             if (isLocked) return;
             if (correctOption) return;
+            if (isTimeUp) return;
             const opt = btn.dataset.option;
             optionBtns.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
@@ -1116,6 +1350,11 @@
             playerStatus.className = 'status-msg error';
             return;
         }
+        if (isTimeUp) {
+            playerStatus.textContent = 'Time is up! Cannot lock now.';
+            playerStatus.className = 'status-msg error';
+            return;
+        }
 
         lockBtn.disabled = true;
         optionBtns.forEach(b => b.disabled = true);
@@ -1138,6 +1377,9 @@
                 if (data.correctOption) {
                     throw new Error('Answer already revealed');
                 }
+                // Check if timer still active (we can compute, but server side we trust client side)
+                // However we can also check roundStart, but we'll rely on client timer.
+                // If time up, we shouldn't even get here because button disabled.
                 const newLocks = { ...locks };
                 newLocks[currentUser.uid] = {
                     playerName: playerName,
@@ -1146,7 +1388,7 @@
                 };
                 transaction.update(roomRef, { locks: newLocks });
             });
-            // The listener will update UI
+            // Listener will update UI
         } catch (error) {
             console.error('Lock error:', error);
             let msg = error.message;
@@ -1262,6 +1504,8 @@
         adminToggleBtn.classList.add('active');
         adminToggleBtn.textContent = 'Player';
         renderAdminView();
+        // If projector open, update it
+        if (projectorOverlay.classList.contains('active')) renderProjector();
     }
 
     function switchToPlayerMode() {
@@ -1299,6 +1543,9 @@
             if (!docSnap.exists()) {
                 lockData = {};
                 correctOption = null;
+                roundStart = null;
+                // Stop timer if running
+                stopTimer();
                 if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     if (!isLocked) {
@@ -1314,8 +1561,22 @@
             const data = docSnap.data();
             const locks = data.locks || {};
             const correct = data.correctOption || null;
+            const start = data.roundStart || null;
             lockData = locks;
             correctOption = correct;
+            roundStart = start;
+
+            // Timer management
+            if (roundStart) {
+                // Start timer if not already running
+                if (!timerInterval) startTimer();
+            } else {
+                stopTimer();
+                // Reset timer display
+                if (playerTimer) { playerTimer.textContent = '⏱ 15s'; playerTimer.className = 'timer-display'; }
+                if (projectorTimer) { projectorTimer.textContent = '⏱ 15s'; projectorTimer.className = 'projector-timer'; }
+                isTimeUp = false;
+            }
 
             // Update Player UI
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
@@ -1338,6 +1599,7 @@
                         revealFeedback(myLock.option);
                     }
                 } else {
+                    // Player not locked yet
                     if (correctOption) {
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
@@ -1345,7 +1607,16 @@
                         lockBtn.classList.add('revealed');
                         playerStatus.textContent = 'Answer already revealed.';
                         playerStatus.className = 'status-msg warning';
+                    } else if (isTimeUp) {
+                        // Time up, disable
+                        optionBtns.forEach(b => b.disabled = true);
+                        lockBtn.disabled = true;
+                        lockBtn.textContent = '⏰ Time\'s up';
+                        lockBtn.classList.add('revealed');
+                        playerStatus.textContent = 'Time is up! You cannot lock now.';
+                        playerStatus.className = 'status-msg error';
                     } else {
+                        // Normal: allow selection if not locked
                         if (!isLocked) {
                             optionBtns.forEach(b => b.disabled = false);
                             if (selectedOption) lockBtn.disabled = false;
@@ -1364,6 +1635,7 @@
             // Projector view (if open)
             if (projectorOverlay.classList.contains('active')) {
                 renderProjector();
+                // Update timer display on projector (handled by timer interval)
             }
         }, (error) => {
             console.error('Listener error:', error);
@@ -1386,9 +1658,6 @@
         const { entries, total, locked, sorted } = getDisplayData();
         projTotal.textContent = total;
         projLocked.textContent = locked;
-
-        // Detect new locks for notification (only in admin, not in projector)
-        // but we keep it silent in projector.
 
         let html = '';
         if (viewMode === 'group') {
@@ -1418,7 +1687,6 @@
             });
             html += '</div>';
         } else {
-            // list view
             if (sorted.length === 0) {
                 html = '<div style="text-align:center; color:#475569; padding:40px;">No players yet...</div>';
             } else {
@@ -1454,14 +1722,10 @@
         totalCount.textContent = total;
         lockedCount.textContent = locked;
 
-        // New lock notification (only in admin)
+        // Notification for new locks (optional)
         const currentKeys = new Set(Object.keys(lockData));
         const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
-        if (newKeys.length > 0) {
-            // Just a subtle console notification; we already have the admin panel live
-            // Optionally we could show a toast, but we keep it clean.
-            // We already have the display updating.
-        }
+        // Play sound for new locks? We'll keep it silent in admin view.
         previousLockKeys = new Set(Object.keys(lockData));
 
         let html = '';
@@ -1565,16 +1829,34 @@
     projectorBtn.addEventListener('click', () => {
         projectorOverlay.classList.add('active');
         renderProjector();
+        // Start particles
+        setTimeout(() => {
+            initParticles();
+            window.addEventListener('resize', resizeParticles);
+        }, 100);
+        // Ensure timer is running
+        if (!timerInterval && roundStart) startTimer();
+        // Update timer display immediately
+        updateTimerDisplay();
     });
 
     projectorExitBtn.addEventListener('click', () => {
         projectorOverlay.classList.remove('active');
+        if (particleRunning) {
+            particleRunning = false;
+            cancelAnimationFrame(particleAnimationId);
+        }
+        window.removeEventListener('resize', resizeParticles);
     });
 
-    // Also close projector with Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && projectorOverlay.classList.contains('active')) {
             projectorOverlay.classList.remove('active');
+            if (particleRunning) {
+                particleRunning = false;
+                cancelAnimationFrame(particleAnimationId);
+            }
+            window.removeEventListener('resize', resizeParticles);
         }
     });
 
@@ -1600,10 +1882,12 @@
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { locks: {}, roundStart: Timestamp.now(), correctOption: null }, { merge: true });
             alert('New round started!');
+            // Reset player state
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 isLocked = false;
                 hasShownFeedback = false;
                 selectedOption = null;
+                isTimeUp = false;
                 optionBtns.forEach(b => {
                     b.classList.remove('selected', 'blink-green', 'blink-red');
                     b.style.borderColor = '';
@@ -1615,7 +1899,9 @@
                 lockBtn.classList.remove('locked', 'revealed');
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
+                // Timer will be started by listener
             }
+            // Refresh projector if open
             if (projectorOverlay.classList.contains('active')) renderProjector();
         } catch (error) {
             alert('Failed: ' + error.message);
@@ -1632,6 +1918,7 @@
                 isLocked = false;
                 hasShownFeedback = false;
                 selectedOption = null;
+                isTimeUp = false;
                 optionBtns.forEach(b => {
                     b.classList.remove('selected', 'blink-green', 'blink-red');
                     b.style.borderColor = '';
@@ -1643,8 +1930,17 @@
                 lockBtn.classList.remove('locked', 'revealed');
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
+                stopTimer();
+                if (playerTimer) { playerTimer.textContent = '⏱ 15s'; playerTimer.className = 'timer-display'; }
             }
-            if (projectorOverlay.classList.contains('active')) renderProjector();
+            if (projectorOverlay.classList.contains('active')) {
+                projectorOverlay.classList.remove('active');
+                if (particleRunning) {
+                    particleRunning = false;
+                    cancelAnimationFrame(particleAnimationId);
+                }
+                window.removeEventListener('resize', resizeParticles);
+            }
         } catch (error) {
             alert('Failed: ' + error.message);
         }
@@ -1655,13 +1951,18 @@
     refreshBtn.addEventListener('click', () => { connectToRoom(ROOM_ID); });
 
     // --------------------------------------------------------------
-    // Initial load
+    // Cleanup on unload
     // --------------------------------------------------------------
-    console.log('Quiz Lock System – Admin + Clean Projector loaded');
-
     window.addEventListener('beforeunload', () => {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
+        stopTimer();
+        if (particleRunning) {
+            particleRunning = false;
+            cancelAnimationFrame(particleAnimationId);
+        }
     });
+
+    console.log('Quiz Lock System – with Timer & Dramatic Projector loaded');
 </script>
 </body>
 </html>
