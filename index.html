@@ -233,6 +233,10 @@
             color: #ef4444;
             text-shadow: 0 0 40px rgba(239, 68, 68, 0.4);
         }
+        .timer-display.stopped {
+            color: #f87171;
+            text-shadow: 0 0 40px rgba(248, 113, 113, 0.4);
+        }
 
         .options-grid {
             display: grid;
@@ -534,6 +538,7 @@
             flex-shrink: 0;
             padding-bottom: 4px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .admin-actions .btn {
             padding: 12px 22px;
@@ -561,6 +566,22 @@
         .admin-actions .btn-toggle-view:hover { transform: scale(1.02); background: rgba(52,211,153,0.5); }
         .admin-actions .btn-projector { background: rgba(234,179,8,0.3); color: #fcd34d; box-shadow: 0 4px 20px rgba(234,179,8,0.1); }
         .admin-actions .btn-projector:hover { transform: scale(1.02); background: rgba(234,179,8,0.5); }
+        .admin-actions .btn-start-round {
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #0f172a;
+            box-shadow: 0 4px 20px rgba(250,204,21,0.3);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .admin-actions .btn-start-round:hover { transform: scale(1.02); background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .admin-actions .btn-stop-locking {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .admin-actions .btn-stop-locking:hover { transform: scale(1.02); background: linear-gradient(135deg, #dc2626, #b91c1c); }
 
         /* ============================================================ */
         /* PROJECTOR OVERLAY – Dramatic Big Screen */
@@ -665,6 +686,10 @@
         .projector-timer.ended {
             color: #ef4444;
             text-shadow: 0 0 80px rgba(239,68,68,0.6);
+        }
+        .projector-timer.stopped {
+            color: #f87171;
+            text-shadow: 0 0 80px rgba(248,113,113,0.6);
         }
 
         .projector-body {
@@ -900,8 +925,7 @@
                 <h2>🔐 Choose your answer</h2>
                 <p>Tap an option then Lock</p>
             </div>
-            <!-- Timer -->
-            <div class="timer-display" id="playerTimer">⏱ 15s</div>
+            <div class="timer-display" id="playerTimer">⏱ --</div>
             <div class="options-grid">
                 <button class="option-btn" data-option="A">A</button>
                 <button class="option-btn" data-option="B">B</button>
@@ -925,15 +949,16 @@
             <!-- Rendered by JS -->
         </div>
         <div class="admin-actions">
+            <button class="btn btn-start-round" id="startRoundBtn">⏱ Time to lock up</button>
+            <button class="btn btn-stop-locking" id="stopLockingBtn">⏹ Stop Locking</button>
             <button class="btn btn-projector" id="projectorBtn">📽️ Show Projector</button>
-            <button class="btn btn-warning" id="resetBtn">🔄 New Round</button>
-            <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
             <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
             <button class="btn btn-clear-correct" id="clearCorrectBtn">✕ Clear Correct</button>
             <button class="btn btn-toggle-view" id="toggleViewBtn">👥 List View</button>
+            <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
         </div>
         <p style="color:#64748b; font-size:0.55rem; text-align:center; margin-top:4px; opacity:0.6;">
-            Click an option column (A/B/C/D) to mark it as correct.
+            Click an option column (A/B/C/D) to mark it as correct. "Time to lock up" starts 15s timer. "Stop Locking" ends it immediately.
         </p>
     </div>
 </div>
@@ -946,7 +971,7 @@
         <h1>📊 NOORUSSALAM – MEGA QUIZ</h1>
         <div class="sub">Live Results</div>
     </div>
-    <div class="projector-timer" id="projectorTimer">⏱ 15s</div>
+    <div class="projector-timer" id="projectorTimer">⏱ --</div>
     <div class="projector-stats" id="projectorStats">
         <div class="stat-item">👥 Total: <span id="projTotal">0</span></div>
         <div class="stat-item">🔒 Locked: <span id="projLocked">0</span></div>
@@ -1027,7 +1052,7 @@
         'C': '#eab308',
         'D': '#ef4444'
     };
-    const LOCK_DURATION = 15; // seconds
+    const LOCK_DURATION = 30;
 
     // --------------------------------------------------------------
     // State
@@ -1041,10 +1066,11 @@
     let lockData = {};
     let correctOption = null;
     let hasShownFeedback = false;
-    let viewMode = 'group'; // 'group' or 'list'
-    let roundStart = null; // server timestamp
+    let viewMode = 'group';
+    let roundStart = null;
     let timerInterval = null;
     let isTimeUp = false;
+    let roundEnded = false; // manual stop
 
     // --------------------------------------------------------------
     // DOM Elements
@@ -1071,7 +1097,8 @@
     const totalCount = document.getElementById('totalCount');
     const lockedCount = document.getElementById('lockedCount');
     const adminDisplayArea = document.getElementById('adminDisplayArea');
-    const resetBtn = document.getElementById('resetBtn');
+    const startRoundBtn = document.getElementById('startRoundBtn');
+    const stopLockingBtn = document.getElementById('stopLockingBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
     const refreshBtn = document.getElementById('refreshBtn');
     const clearCorrectBtn = document.getElementById('clearCorrectBtn');
@@ -1105,10 +1132,13 @@
     function updateTimerDisplay() {
         const remaining = getRemainingSeconds();
         const seconds = Math.ceil(remaining);
-        const isEnded = seconds <= 0;
-        // Update player timer
+        const isEnded = seconds <= 0 || roundEnded;
+        // Player timer
         if (playerTimer) {
-            if (isEnded) {
+            if (roundEnded) {
+                playerTimer.textContent = '⏱ Locking Stopped';
+                playerTimer.className = 'timer-display stopped';
+            } else if (isEnded) {
                 playerTimer.textContent = '⏱ Time\'s up!';
                 playerTimer.className = 'timer-display ended';
             } else {
@@ -1116,9 +1146,12 @@
                 playerTimer.className = 'timer-display';
             }
         }
-        // Update projector timer
+        // Projector timer
         if (projectorTimer) {
-            if (isEnded) {
+            if (roundEnded) {
+                projectorTimer.textContent = '⏱ LOCKING STOPPED';
+                projectorTimer.className = 'projector-timer stopped';
+            } else if (isEnded) {
                 projectorTimer.textContent = '⏱ TIME\'S UP!';
                 projectorTimer.className = 'projector-timer ended';
             } else {
@@ -1126,35 +1159,43 @@
                 projectorTimer.className = 'projector-timer';
             }
         }
-        // Update lock availability
-        if (isEnded) {
+        // Lock availability
+        if (roundEnded || isEnded) {
             isTimeUp = true;
             if (!isLocked && currentMode === 'player' && optionsView.classList.contains('active')) {
-                // Disable locking and options
                 optionBtns.forEach(b => b.disabled = true);
                 lockBtn.disabled = true;
-                lockBtn.textContent = '⏰ Time\'s up';
+                if (roundEnded) {
+                    lockBtn.textContent = '⏹ Locking Stopped';
+                } else {
+                    lockBtn.textContent = '⏰ Time\'s up';
+                }
                 lockBtn.classList.add('revealed');
-                playerStatus.textContent = 'Time is up! You cannot lock now.';
+                if (roundEnded) {
+                    playerStatus.textContent = 'Locking has been stopped by admin.';
+                } else {
+                    playerStatus.textContent = 'Time is up! You cannot lock now.';
+                }
                 playerStatus.className = 'status-msg error';
             }
         } else {
             isTimeUp = false;
-            // Only enable if not locked and no correct option revealed
             if (!isLocked && !correctOption && currentMode === 'player' && optionsView.classList.contains('active')) {
                 optionBtns.forEach(b => b.disabled = false);
                 if (selectedOption) lockBtn.disabled = false;
-                // Revert lock button text if it was changed
                 if (!lockBtn.classList.contains('locked')) {
                     lockBtn.textContent = '🔒 Lock';
                     lockBtn.classList.remove('revealed');
                 }
+                playerStatus.textContent = selectedOption ? `Selected: ${selectedOption}` : 'Select an option';
+                playerStatus.className = 'status-msg';
             }
         }
     }
 
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
+        roundEnded = false;
         updateTimerDisplay();
         timerInterval = setInterval(updateTimerDisplay, 500);
     }
@@ -1164,10 +1205,31 @@
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        // Don't reset display here; let updateTimerDisplay handle it
+    }
+
+    function forceStopLocking() {
+        roundEnded = true;
+        isTimeUp = true;
+        stopTimer();
+        updateTimerDisplay();
+        // Disable all player locks
+        if (currentMode === 'player' && optionsView.classList.contains('active')) {
+            optionBtns.forEach(b => b.disabled = true);
+            lockBtn.disabled = true;
+            lockBtn.textContent = '⏹ Locking Stopped';
+            lockBtn.classList.add('revealed');
+            playerStatus.textContent = 'Locking has been stopped by admin.';
+            playerStatus.className = 'status-msg error';
+        }
+        // Update projector if open
+        if (projectorOverlay.classList.contains('active')) {
+            updateTimerDisplay();
+        }
     }
 
     // --------------------------------------------------------------
-    // 🎨 Particle system for projector background
+    // 🎨 Particle system
     // --------------------------------------------------------------
     let particles = [];
     let particleRunning = false;
@@ -1186,7 +1248,7 @@
                 speedX: (Math.random() - 0.5) * 0.4,
                 speedY: (Math.random() - 0.5) * 0.4,
                 opacity: Math.random() * 0.5 + 0.2,
-                hue: Math.random() * 60 + 40 // golden/greenish
+                hue: Math.random() * 60 + 40
             });
         }
         if (particleRunning) cancelAnimationFrame(particleAnimationId);
@@ -1242,11 +1304,11 @@
             localStorage.setItem('quizPlayerName', name);
             setupView.classList.add('hidden');
             optionsView.classList.add('active');
-            // Reset selection and timer state
             selectedOption = null;
             isLocked = false;
             hasShownFeedback = false;
             isTimeUp = false;
+            roundEnded = false;
             optionBtns.forEach(b => {
                 b.classList.remove('selected', 'blink-green', 'blink-red');
                 b.style.borderColor = '';
@@ -1258,7 +1320,6 @@
             lockBtn.classList.remove('locked', 'revealed');
             playerStatus.textContent = 'Select an option';
             playerStatus.className = 'status-msg';
-            // Check if already locked or timer ended via listener
             if (currentUser && lockData[currentUser.uid]) {
                 const existing = lockData[currentUser.uid];
                 isLocked = true;
@@ -1274,13 +1335,12 @@
                 playerStatus.className = 'status-msg success';
                 if (correctOption) revealFeedback(selectedOption);
             }
-            // If timer already ended, disable lock
             if (isTimeUp && !isLocked) {
                 optionBtns.forEach(b => b.disabled = true);
                 lockBtn.disabled = true;
-                lockBtn.textContent = '⏰ Time\'s up';
+                lockBtn.textContent = roundEnded ? '⏹ Locking Stopped' : '⏰ Time\'s up';
                 lockBtn.classList.add('revealed');
-                playerStatus.textContent = 'Time is up! You cannot lock now.';
+                playerStatus.textContent = roundEnded ? 'Locking has been stopped.' : 'Time is up!';
                 playerStatus.className = 'status-msg error';
             }
             if (correctOption) {
@@ -1291,8 +1351,7 @@
                 playerStatus.textContent = 'Answer already revealed.';
                 playerStatus.className = 'status-msg warning';
             }
-            // Start timer if not already started
-            if (!timerInterval) startTimer();
+            if (!timerInterval && roundStart) startTimer();
         } else {
             playerNameInput.focus();
             playerNameInput.style.borderColor = '#f87171';
@@ -1351,7 +1410,7 @@
             return;
         }
         if (isTimeUp) {
-            playerStatus.textContent = 'Time is up! Cannot lock now.';
+            playerStatus.textContent = 'Cannot lock now.';
             playerStatus.className = 'status-msg error';
             return;
         }
@@ -1371,15 +1430,8 @@
                 }
                 const data = docSnap.data();
                 const locks = data.locks || {};
-                if (locks[currentUser.uid]) {
-                    throw new Error('Already locked');
-                }
-                if (data.correctOption) {
-                    throw new Error('Answer already revealed');
-                }
-                // Check if timer still active (we can compute, but server side we trust client side)
-                // However we can also check roundStart, but we'll rely on client timer.
-                // If time up, we shouldn't even get here because button disabled.
+                if (locks[currentUser.uid]) throw new Error('Already locked');
+                if (data.correctOption) throw new Error('Answer already revealed');
                 const newLocks = { ...locks };
                 newLocks[currentUser.uid] = {
                     playerName: playerName,
@@ -1388,7 +1440,6 @@
                 };
                 transaction.update(roomRef, { locks: newLocks });
             });
-            // Listener will update UI
         } catch (error) {
             console.error('Lock error:', error);
             let msg = error.message;
@@ -1504,7 +1555,6 @@
         adminToggleBtn.classList.add('active');
         adminToggleBtn.textContent = 'Player';
         renderAdminView();
-        // If projector open, update it
         if (projectorOverlay.classList.contains('active')) renderProjector();
     }
 
@@ -1544,7 +1594,6 @@
                 lockData = {};
                 correctOption = null;
                 roundStart = null;
-                // Stop timer if running
                 stopTimer();
                 if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
@@ -1566,19 +1615,18 @@
             correctOption = correct;
             roundStart = start;
 
-            // Timer management
-            if (roundStart) {
-                // Start timer if not already running
+            if (roundStart && !roundEnded) {
                 if (!timerInterval) startTimer();
-            } else {
+            } else if (!roundStart) {
                 stopTimer();
-                // Reset timer display
-                if (playerTimer) { playerTimer.textContent = '⏱ 15s'; playerTimer.className = 'timer-display'; }
-                if (projectorTimer) { projectorTimer.textContent = '⏱ 15s'; projectorTimer.className = 'projector-timer'; }
                 isTimeUp = false;
+                roundEnded = false;
+                // Reset timer display
+                if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
+                if (projectorTimer) { projectorTimer.textContent = '⏱ --'; projectorTimer.className = 'projector-timer'; }
             }
 
-            // Update Player UI
+            // Player UI
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 const myLock = currentUser ? locks[currentUser.uid] : null;
                 if (myLock) {
@@ -1599,7 +1647,6 @@
                         revealFeedback(myLock.option);
                     }
                 } else {
-                    // Player not locked yet
                     if (correctOption) {
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
@@ -1607,16 +1654,14 @@
                         lockBtn.classList.add('revealed');
                         playerStatus.textContent = 'Answer already revealed.';
                         playerStatus.className = 'status-msg warning';
-                    } else if (isTimeUp) {
-                        // Time up, disable
+                    } else if (isTimeUp || roundEnded) {
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
-                        lockBtn.textContent = '⏰ Time\'s up';
+                        lockBtn.textContent = roundEnded ? '⏹ Locking Stopped' : '⏰ Time\'s up';
                         lockBtn.classList.add('revealed');
-                        playerStatus.textContent = 'Time is up! You cannot lock now.';
+                        playerStatus.textContent = roundEnded ? 'Locking has been stopped.' : 'Time is up!';
                         playerStatus.className = 'status-msg error';
                     } else {
-                        // Normal: allow selection if not locked
                         if (!isLocked) {
                             optionBtns.forEach(b => b.disabled = false);
                             if (selectedOption) lockBtn.disabled = false;
@@ -1627,16 +1672,8 @@
                 }
             }
 
-            // Admin view
-            if (currentMode === 'admin') {
-                renderAdminView();
-            }
-
-            // Projector view (if open)
-            if (projectorOverlay.classList.contains('active')) {
-                renderProjector();
-                // Update timer display on projector (handled by timer interval)
-            }
+            if (currentMode === 'admin') renderAdminView();
+            if (projectorOverlay.classList.contains('active')) renderProjector();
         }, (error) => {
             console.error('Listener error:', error);
         });
@@ -1722,10 +1759,6 @@
         totalCount.textContent = total;
         lockedCount.textContent = locked;
 
-        // Notification for new locks (optional)
-        const currentKeys = new Set(Object.keys(lockData));
-        const newKeys = [...currentKeys].filter(k => !previousLockKeys.has(k));
-        // Play sound for new locks? We'll keep it silent in admin view.
         previousLockKeys = new Set(Object.keys(lockData));
 
         let html = '';
@@ -1755,7 +1788,6 @@
                 `;
             });
             html += '</div>';
-            // Attach click listeners for admin
             setTimeout(() => {
                 document.querySelectorAll('.option-column').forEach(col => {
                     col.onclick = () => {
@@ -1815,7 +1847,7 @@
     }
 
     // --------------------------------------------------------------
-    // Toggle View (admin)
+    // Toggle View
     // --------------------------------------------------------------
     toggleViewBtn.addEventListener('click', () => {
         viewMode = (viewMode === 'group') ? 'list' : 'group';
@@ -1829,14 +1861,11 @@
     projectorBtn.addEventListener('click', () => {
         projectorOverlay.classList.add('active');
         renderProjector();
-        // Start particles
         setTimeout(() => {
             initParticles();
             window.addEventListener('resize', resizeParticles);
         }, 100);
-        // Ensure timer is running
-        if (!timerInterval && roundStart) startTimer();
-        // Update timer display immediately
+        if (roundStart && !timerInterval && !roundEnded) startTimer();
         updateTimerDisplay();
     });
 
@@ -1861,7 +1890,68 @@
     });
 
     // --------------------------------------------------------------
-    // Admin: Clear correct option
+    // Admin: Start Round (15s timer)
+    // --------------------------------------------------------------
+    startRoundBtn.addEventListener('click', async () => {
+        if (!confirm(`Start a new round with ${LOCK_DURATION} seconds timer? This will clear all locks.`)) return;
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            await setDoc(roomRef, {
+                locks: {},
+                roundStart: Timestamp.now(),
+                correctOption: null
+            }, { merge: true });
+            // Reset player state
+            if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                isLocked = false;
+                hasShownFeedback = false;
+                selectedOption = null;
+                isTimeUp = false;
+                roundEnded = false;
+                optionBtns.forEach(b => {
+                    b.classList.remove('selected', 'blink-green', 'blink-red');
+                    b.style.borderColor = '';
+                    b.style.background = '';
+                    b.disabled = false;
+                });
+                lockBtn.disabled = true;
+                lockBtn.textContent = '🔒 Lock';
+                lockBtn.classList.remove('locked', 'revealed');
+                playerStatus.textContent = 'Select an option';
+                playerStatus.className = 'status-msg';
+            }
+            if (projectorOverlay.classList.contains('active')) renderProjector();
+            alert(`Round started! ${LOCK_DURATION}s to lock.`);
+        } catch (error) {
+            alert('Failed to start round: ' + error.message);
+        }
+    });
+
+    // --------------------------------------------------------------
+    // Admin: Stop Locking (immediate)
+    // --------------------------------------------------------------
+    stopLockingBtn.addEventListener('click', async () => {
+        if (!confirm('Stop locking immediately? Players will no longer be able to lock.')) return;
+        // Set roundEnded flag locally and in Firestore
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            // We set roundStart to a past timestamp to effectively end it, but we'll use a flag
+            // Since we don't have a separate field, we set roundStart to null and let the client handle the flag
+            // Actually, we can set roundStart to null and set a 'locked' state? We'll just use a flag.
+            // Better: set roundStart to null and let the client know it's ended.
+            // But we want to keep the locks, so we set roundStart to null (meaning no active round)
+            await setDoc(roomRef, { roundStart: null }, { merge: true });
+            // The listener will update the timer to show "Locking Stopped"
+            // Also force local state
+            forceStopLocking();
+            alert('Locking stopped! Players cannot lock now.');
+        } catch (error) {
+            alert('Failed to stop locking: ' + error.message);
+        }
+    });
+
+    // --------------------------------------------------------------
+    // Admin: Clear correct
     // --------------------------------------------------------------
     clearCorrectBtn.addEventListener('click', async () => {
         if (!confirm('Clear the correct answer? Players will no longer see feedback.')) return;
@@ -1874,40 +1964,8 @@
     });
 
     // --------------------------------------------------------------
-    // Admin: New Round / End Quiz
+    // Admin: End Quiz
     // --------------------------------------------------------------
-    async function newRound() {
-        if (!confirm('This will clear all current locks and correct answer. Continue?')) return;
-        try {
-            const roomRef = doc(db, 'rooms', ROOM_ID);
-            await setDoc(roomRef, { locks: {}, roundStart: Timestamp.now(), correctOption: null }, { merge: true });
-            alert('New round started!');
-            // Reset player state
-            if (currentMode === 'player' && optionsView.classList.contains('active')) {
-                isLocked = false;
-                hasShownFeedback = false;
-                selectedOption = null;
-                isTimeUp = false;
-                optionBtns.forEach(b => {
-                    b.classList.remove('selected', 'blink-green', 'blink-red');
-                    b.style.borderColor = '';
-                    b.style.background = '';
-                    b.disabled = false;
-                });
-                lockBtn.disabled = true;
-                lockBtn.textContent = '🔒 Lock';
-                lockBtn.classList.remove('locked', 'revealed');
-                playerStatus.textContent = 'Select an option';
-                playerStatus.className = 'status-msg';
-                // Timer will be started by listener
-            }
-            // Refresh projector if open
-            if (projectorOverlay.classList.contains('active')) renderProjector();
-        } catch (error) {
-            alert('Failed: ' + error.message);
-        }
-    }
-
     async function endQuiz() {
         if (!confirm('This will clear ALL data (including past rounds). Are you sure?')) return;
         try {
@@ -1919,6 +1977,7 @@
                 hasShownFeedback = false;
                 selectedOption = null;
                 isTimeUp = false;
+                roundEnded = false;
                 optionBtns.forEach(b => {
                     b.classList.remove('selected', 'blink-green', 'blink-red');
                     b.style.borderColor = '';
@@ -1931,7 +1990,7 @@
                 playerStatus.textContent = 'Select an option';
                 playerStatus.className = 'status-msg';
                 stopTimer();
-                if (playerTimer) { playerTimer.textContent = '⏱ 15s'; playerTimer.className = 'timer-display'; }
+                if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
             }
             if (projectorOverlay.classList.contains('active')) {
                 projectorOverlay.classList.remove('active');
@@ -1946,12 +2005,11 @@
         }
     }
 
-    resetBtn.addEventListener('click', newRound);
     endQuizBtn.addEventListener('click', endQuiz);
     refreshBtn.addEventListener('click', () => { connectToRoom(ROOM_ID); });
 
     // --------------------------------------------------------------
-    // Cleanup on unload
+    // Cleanup
     // --------------------------------------------------------------
     window.addEventListener('beforeunload', () => {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
@@ -1962,7 +2020,7 @@
         }
     });
 
-    console.log('Quiz Lock System – with Timer & Dramatic Projector loaded');
+    console.log('Quiz Lock System – with "Stop Locking" button loaded');
 </script>
 </body>
 </html>
