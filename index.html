@@ -218,6 +218,11 @@
             color: #94a3b8;
             font-size: 0.9rem;
         }
+        .options-header .hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
 
         .timer-display {
             text-align: center;
@@ -281,7 +286,7 @@
             transform: scale(0.95);
         }
 
-        /* Lifeline button – stylish */
+        /* Lifeline button – stylish & independent */
         .lifeline-btn {
             padding: 14px 28px;
             border-radius: 60px;
@@ -1044,6 +1049,7 @@
             <div class="options-header">
                 <h2>🔐 Choose your answer</h2>
                 <p>Tap an option, then Lock</p>
+                <div class="hint">💡 Lifeline does not affect your answer choice</div>
             </div>
             <div class="timer-display" id="playerTimer">⏱ --</div>
             <div class="options-grid" id="optionsGrid">
@@ -1326,7 +1332,7 @@
     }
 
     // --------------------------------------------------------------
-    // 🧠 Lifeline logic – separate button, stores usage & triggers notification
+    // 🧠 Lifeline logic – independent of option/lock
     // --------------------------------------------------------------
     async function useLifeline() {
         if (usedLifeline || isTimeUp || isLocked || correctOption) return;
@@ -1344,7 +1350,7 @@
         void lifelineBtn.offsetWidth;
         lifelineBtn.classList.add('pop');
 
-        // 🔥 Store lifeline usage in Firestore
+        // Store in Firestore
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
             const docSnap = await getDoc(roomRef);
@@ -1360,7 +1366,7 @@
             console.warn('Could not save lifeline usage:', e);
         }
 
-        // Play sound & vibrate
+        // Sound & vibrate
         playLifelineSound();
         triggerVibration();
 
@@ -1444,7 +1450,7 @@
     });
 
     // --------------------------------------------------------------
-    // Lock action
+    // Lock action – finalises the answer
     // --------------------------------------------------------------
     lockBtn.addEventListener('click', async () => {
         if (isLocked) return;
@@ -2221,7 +2227,7 @@
         }
     });
 
-    console.log('Quiz Lock System – Advanced Lifeline with Admin notification');
+    console.log('Quiz Lock System – Lifeline independent, Kahoot‑style');
 </script>
 </body>
 </html>
