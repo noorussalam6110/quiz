@@ -1566,7 +1566,7 @@
     });
 
     // --------------------------------------------------------------
-    // 🔗 Firestore Listener (with full auto‑reset)
+    // 🔗 Firestore Listener (with full auto‑reset on new round)
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1597,11 +1597,13 @@
             lockData = locks;
             correctOption = correct;
 
-            // 🔄 Detect new round
-            const newRoundStarted = (start !== null && prevRoundStart !== null && start.seconds !== prevRoundStart.seconds);
+            // 🔄 Detect new round – including first round after null
+            const newRoundStarted = (start !== null && (prevRoundStart === null || start.seconds !== prevRoundStart.seconds));
             if (newRoundStarted) {
+                // Reset player state for new round
                 if (currentMode === 'player' && optionsView.classList.contains('active') && !lockData[currentUser?.uid]) {
                     resetPlayerState();
+                    // Re‑enable options if round is active and not ended
                     if (!roundEnded && !isTimeUp && !correctOption) {
                         optionBtns.forEach(b => b.disabled = false);
                         lifelineBtn.disabled = false;
@@ -2116,7 +2118,7 @@
         }
     });
 
-    console.log('Quiz Lock System – Full Auto‑Reset on End Quiz');
+    console.log('Quiz Lock System – Full Auto‑Reset on New Round');
 </script>
 </body>
 </html>
