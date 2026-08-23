@@ -286,7 +286,7 @@
             transform: scale(0.95);
         }
 
-        /* Lifeline button – stylish & independent */
+        /* Lifeline button */
         .lifeline-btn {
             padding: 14px 28px;
             border-radius: 60px;
@@ -432,7 +432,7 @@
             padding: 10px 0;
         }
 
-        /* Group View (columns) */
+        /* Group View */
         .projector-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -588,6 +588,72 @@
         .player-list-card .pl-status.status-correct { color: #22c55e; }
         .player-list-card .pl-status.status-wrong { color: #ef4444; }
 
+        /* ---- Lifeline User Modal ---- */
+        .lifeline-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(16px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9996;
+            padding: 20px;
+        }
+        .lifeline-modal.active { display: flex; }
+        .lifeline-modal-content {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 25px 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            font-family: 'Anek Malayalam', sans-serif;
+        }
+        .lifeline-modal-content h2 {
+            color: #facc15;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lifeline-modal-content h2 button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lifeline-modal-content h2 button:hover { color: #f87171; transform: rotate(90deg); }
+        .lifeline-modal-content .lifeline-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+            color: #e2e8f0;
+        }
+        .lifeline-modal-content .lifeline-entry .lifeline-name {
+            font-weight: 600;
+        }
+        .lifeline-modal-content .lifeline-entry .lifeline-time {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .lifeline-modal-content .empty-state {
+            color: #64748b;
+            text-align: center;
+            padding: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* Admin actions */
         .admin-actions {
             display: flex;
             gap: 12px;
@@ -638,6 +704,20 @@
             font-size: 1.1rem;
         }
         .admin-actions .btn-stop-locking:hover { transform: scale(1.02); background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        .admin-actions .btn-lifeline-list {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+            box-shadow: 0 4px 20px rgba(236,72,153,0.3);
+            font-weight: 700;
+        }
+        .admin-actions .btn-lifeline-list:hover { transform: scale(1.02); background: linear-gradient(135deg, #db2777, #be185d); }
+        .admin-actions .btn-host {
+            background: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+            box-shadow: 0 4px 20px rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+        .admin-actions .btn-host:hover { transform: scale(1.02); background: rgba(59,130,246,0.5); }
 
         /* ============================================================ */
         /* PROJECTOR OVERLAY */
@@ -806,6 +886,33 @@
             padding: 6px 14px;
         }
 
+        /* Projector host button (discreet) */
+        .projector-host-btn {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            background: rgba(30,41,59,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(51,65,85,0.3);
+            color: #94a3b8;
+            font-size: 1.2rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-family: 'Anek Malayalam', sans-serif;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .projector-host-btn:hover {
+            background: rgba(59,130,246,0.2);
+            color: #93c5fd;
+            border-color: rgba(59,130,246,0.4);
+        }
+
         .projector-exit {
             position: absolute;
             top: 20px;
@@ -944,11 +1051,14 @@
         .admin-toggle.mobile-hidden { display: none !important; }
 
         .admin-display-area::-webkit-scrollbar,
-        .projector-body::-webkit-scrollbar { width: 4px; }
+        .projector-body::-webkit-scrollbar,
+        .lifeline-modal-content::-webkit-scrollbar { width: 4px; }
         .admin-display-area::-webkit-scrollbar-thumb,
-        .projector-body::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.5); border-radius: 10px; }
+        .projector-body::-webkit-scrollbar-thumb,
+        .lifeline-modal-content::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.5); border-radius: 10px; }
         .admin-display-area::-webkit-scrollbar-track,
-        .projector-body::-webkit-scrollbar-track { background: transparent; }
+        .projector-body::-webkit-scrollbar-track,
+        .lifeline-modal-content::-webkit-scrollbar-track { background: transparent; }
 
         @media (max-width: 768px) {
             .projector-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
@@ -971,6 +1081,10 @@
             .lifeline-notification .lifeline-icon { font-size: 5rem; }
             .lifeline-notification .lifeline-name { font-size: 3.5rem; }
             .lifeline-notification .lifeline-label { font-size: 1.5rem; }
+            .lifeline-modal-content { padding: 20px; }
+            .lifeline-modal-content h2 { font-size: 1.5rem; }
+            .projector-host-btn { font-size: 1rem; padding: 6px 12px; top: 15px; left: 15px; }
+            .projector-exit { top: 15px; right: 15px; width: 40px; height: 40px; font-size: 1.4rem; }
         }
         @media (max-width: 480px) {
             .splash-title { font-size: 1.5rem; }
@@ -1019,6 +1133,19 @@
     <div class="lifeline-label">🆘 Lifeline Used</div>
     <div class="lifeline-icon">🆘</div>
     <div class="lifeline-name" id="lifelineNotifName">Player</div>
+</div>
+
+<!-- Lifeline User List Modal (Admin only) -->
+<div class="lifeline-modal" id="lifelineModal">
+    <div class="lifeline-modal-content">
+        <h2>
+            🆘 Lifeline Users
+            <button id="lifelineModalCloseBtn">✕</button>
+        </h2>
+        <div id="lifelineUserList">
+            <div class="empty-state">Loading...</div>
+        </div>
+    </div>
 </div>
 
 <!-- Main Container -->
@@ -1085,6 +1212,8 @@
             <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
             <button class="btn btn-clear-correct" id="clearCorrectBtn">✕ Clear Correct</button>
             <button class="btn btn-toggle-view" id="toggleViewBtn">👥 List View</button>
+            <button class="btn btn-lifeline-list" id="lifelineListBtn">📋 Lifeline Users</button>
+            <button class="btn btn-host" id="hostBtn">📡 Host Page</button>
             <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
         </div>
         <p style="color:#64748b; font-size:0.55rem; text-align:center; margin-top:4px; opacity:0.6;">
@@ -1096,6 +1225,8 @@
 <!-- Projector Overlay -->
 <div class="projector-overlay" id="projectorOverlay">
     <canvas id="projectorParticles"></canvas>
+    <!-- Host button in projector (top-left) -->
+    <a class="projector-host-btn" id="projectorHostBtn" href="#" target="_blank">📡 Host</a>
     <button class="projector-exit" id="projectorExitBtn">✕</button>
     <div class="projector-header">
         <h1>📊 NOORUSSALAM – MEGA QUIZ</h1>
@@ -1133,6 +1264,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // --------------------------------------------------------------
+    // 📡 HOST PAGE URL (Change this to your host.html location)
+    // --------------------------------------------------------------
+    const HOST_URL = 'host.html'; // 
 
     // --------------------------------------------------------------
     // 🔊 Audio & Vibration
@@ -1257,6 +1393,11 @@
     const clearCorrectBtn = document.getElementById('clearCorrectBtn');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
     const projectorBtn = document.getElementById('projectorBtn');
+    const lifelineListBtn = document.getElementById('lifelineListBtn');
+    const hostBtn = document.getElementById('hostBtn');
+    const lifelineModal = document.getElementById('lifelineModal');
+    const lifelineModalCloseBtn = document.getElementById('lifelineModalCloseBtn');
+    const lifelineUserList = document.getElementById('lifelineUserList');
 
     // Projector elements
     const projectorOverlay = document.getElementById('projectorOverlay');
@@ -1266,6 +1407,7 @@
     const projLocked = document.getElementById('projLocked');
     const projLifeline = document.getElementById('projLifeline');
     const projectorTimer = document.getElementById('projectorTimer');
+    const projectorHostBtn = document.getElementById('projectorHostBtn');
     const particleCanvas = document.getElementById('projectorParticles');
     const ctx = particleCanvas.getContext('2d');
 
@@ -1275,6 +1417,15 @@
 
     roomBadge.textContent = `Room: ${ROOM_ID}`;
     if (IS_MOBILE) adminToggleBtn.classList.add('mobile-hidden');
+
+    // --------------------------------------------------------------
+    // 📡 Set host page links
+    // --------------------------------------------------------------
+    hostBtn.addEventListener('click', () => {
+        window.open(HOST_URL, '_blank');
+    });
+    projectorHostBtn.href = HOST_URL;
+    projectorHostBtn.target = '_blank';
 
     // --------------------------------------------------------------
     // ⏱ Timer functions
@@ -1332,7 +1483,7 @@
     }
 
     // --------------------------------------------------------------
-    // 🧠 Lifeline logic – independent of option/lock
+    // 🧠 Lifeline logic
     // --------------------------------------------------------------
     async function useLifeline() {
         if (usedLifeline || isTimeUp || isLocked || correctOption) return;
@@ -1350,7 +1501,6 @@
         void lifelineBtn.offsetWidth;
         lifelineBtn.classList.add('pop');
 
-        // Store in Firestore
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
             const docSnap = await getDoc(roomRef);
@@ -1366,7 +1516,6 @@
             console.warn('Could not save lifeline usage:', e);
         }
 
-        // Sound & vibrate
         playLifelineSound();
         triggerVibration();
 
@@ -1450,7 +1599,7 @@
     });
 
     // --------------------------------------------------------------
-    // Lock action – finalises the answer
+    // Lock action
     // --------------------------------------------------------------
     lockBtn.addEventListener('click', async () => {
         if (isLocked) return;
@@ -1651,7 +1800,7 @@
     });
 
     // --------------------------------------------------------------
-    // 🔗 Firestore Listener (with lifeline usage & notifications)
+    // 🔗 Firestore Listener
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1677,6 +1826,7 @@
                     playerStatus.className = 'status-msg';
                 }
                 if (projectorOverlay.classList.contains('active')) renderProjector();
+                if (lifelineModal.classList.contains('active')) renderLifelineList();
                 return;
             }
             const data = docSnap.data();
@@ -1823,13 +1973,14 @@
 
             if (currentMode === 'admin') renderAdminView();
             if (projectorOverlay.classList.contains('active')) renderProjector();
+            if (lifelineModal.classList.contains('active')) renderLifelineList();
         }, (error) => {
             console.error('Listener error:', error);
         });
     }
 
     // --------------------------------------------------------------
-    // 📊 Render functions (with lifeline highlights)
+    // 📊 Render functions
     // --------------------------------------------------------------
     function getDisplayData() {
         const entries = Object.values(lockData);
@@ -1996,6 +2147,44 @@
     }
 
     // --------------------------------------------------------------
+    // 📋 Lifeline User List Modal
+    // --------------------------------------------------------------
+    function renderLifelineList() {
+        const entries = Object.entries(lifelineUsage);
+        if (entries.length === 0) {
+            lifelineUserList.innerHTML = '<div class="empty-state">No lifeline used yet.</div>';
+            return;
+        }
+        let html = '';
+        entries.forEach(([uid, data]) => {
+            const name = data.playerName || 'Anonymous';
+            const time = data.timestamp?.seconds ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString('en-IN', { hour12: false }) : '--:--';
+            html += `
+                <div class="lifeline-entry">
+                    <span class="lifeline-name">🆘 ${name}</span>
+                    <span class="lifeline-time">⏱ ${time}</span>
+                </div>
+            `;
+        });
+        lifelineUserList.innerHTML = html;
+    }
+
+    function openLifelineModal() {
+        lifelineModal.classList.add('active');
+        renderLifelineList();
+    }
+
+    function closeLifelineModal() {
+        lifelineModal.classList.remove('active');
+    }
+
+    lifelineListBtn.addEventListener('click', openLifelineModal);
+    lifelineModalCloseBtn.addEventListener('click', closeLifelineModal);
+    lifelineModal.addEventListener('click', (e) => {
+        if (e.target === lifelineModal) closeLifelineModal();
+    });
+
+    // --------------------------------------------------------------
     // Admin: Update correct option
     // --------------------------------------------------------------
     async function updateCorrectOption(option) {
@@ -2137,6 +2326,7 @@
                 clearTimeout(lifelineNotifTimeout);
                 lifelineNotif.classList.remove('active');
             }
+            if (lifelineModal.classList.contains('active')) closeLifelineModal();
         } catch (error) {
             alert('Failed: ' + error.message);
         }
@@ -2227,7 +2417,7 @@
         }
     });
 
-    console.log('Quiz Lock System – Lifeline independent, Kahoot‑style');
+    console.log('Quiz Lock System – Host button added');
 </script>
 </body>
 </html>
