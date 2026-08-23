@@ -1193,7 +1193,6 @@
                 projectorTimer.className = 'projector-timer';
             }
         }
-        // Lock availability – will be updated in the listener
     }
 
     function startTimer() {
@@ -1330,11 +1329,7 @@
             optionsView.classList.add('active');
             // Reset local state when entering options view
             resetPlayerState();
-            // Check if user already locked, etc. (listener will handle)
-            // But we need to trigger initial state fetch
-            if (currentUser && lockData[currentUser.uid]) {
-                // Will be handled by listener
-            }
+            // The listener will handle the rest
         } else {
             playerNameInput.focus();
             playerNameInput.style.borderColor = '#f87171';
@@ -1591,6 +1586,7 @@
         const roomRef = doc(db, 'rooms', roomId);
         unsubscribeSnapshot = onSnapshot(roomRef, (docSnap) => {
             if (!docSnap.exists()) {
+                // Room deleted or not yet created – reset everything
                 lockData = {};
                 correctOption = null;
                 roundStart = null;
@@ -1599,11 +1595,11 @@
                 if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     resetPlayerState();
-                    playerStatus.textContent = 'No round started yet.';
-                    playerStatus.className = 'status-msg';
                     optionBtns.forEach(b => b.disabled = true);
                     lockBtn.disabled = true;
                     lifelineBtn.disabled = true;
+                    playerStatus.textContent = 'No round started yet.';
+                    playerStatus.className = 'status-msg';
                 }
                 if (projectorOverlay.classList.contains('active')) renderProjector();
                 return;
@@ -1636,14 +1632,12 @@
             const roundEndedNow = (start === null && prevRoundStart !== null);
             if (roundEndedNow) {
                 // Round has ended (either by admin stopping or ending quiz)
-                // Check if there are any locks (if locks exist, it's a stop-locking scenario; else it's end quiz)
                 const hasLocks = Object.keys(locks).length > 0;
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     const myLock = currentUser ? locks[currentUser.uid] : null;
                     if (myLock) {
-                        // Player is locked – show locked state (listener will handle)
-                    } else {
-                        // Player not locked
+                        // Player is locked – keep locked state
+                        // But if this is End Quiz (no locks), we still need to show correct/wrong
                         if (!hasLocks) {
                             // No locks at all – End Quiz scenario
                             resetPlayerState();
@@ -1654,6 +1648,21 @@
                             playerStatus.className = 'status-msg';
                         } else {
                             // There are locks – Stop Locking scenario
+                            // Keep player locked, but disable new locks
+                            // Already handled by lock state
+                        }
+                    } else {
+                        // Player not locked
+                        if (!hasLocks) {
+                            // End Quiz – reset everything
+                            resetPlayerState();
+                            optionBtns.forEach(b => b.disabled = true);
+                            lockBtn.disabled = true;
+                            lifelineBtn.disabled = true;
+                            playerStatus.textContent = 'No round started yet.';
+                            playerStatus.className = 'status-msg';
+                        } else {
+                            // Stop Locking – disable options
                             resetPlayerState(); // clear selection and lifeline
                             optionBtns.forEach(b => b.disabled = true);
                             lockBtn.disabled = true;
@@ -1765,8 +1774,7 @@
                             playerStatus.className = 'status-msg warning';
                         }
                     } else if (roundStart && roundEnded) {
-                        // Round ended (stop locking or timer expired) – already handled above
-                        // but ensure UI is consistent
+                        // Round ended – already handled above
                     } else {
                         // No active round (roundStart null) – already handled
                     }
@@ -2148,7 +2156,7 @@
         }
     });
 
-    console.log('Quiz Lock System – with full auto‑reset on End Quiz');
+    console.log('Quiz Lock System – Full Auto‑Reset on End Quiz');
 </script>
 </body>
 </html>
