@@ -107,6 +107,7 @@
             text-align: center;
             margin-bottom: 6px;
             flex-shrink: 0;
+            position: relative;
         }
         .event-heading h1 {
             font-size: 2.2rem;
@@ -130,6 +131,47 @@
             text-transform: uppercase;
             margin-top: 2px;
             -webkit-text-fill-color: rgba(255, 215, 0, 0.5);
+        }
+
+        /* ---------- HOME BUTTON ---------- */
+        .home-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.05);
+        }
+        .home-btn:hover {
+            background: rgba(255, 215, 0, 0.18);
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            transform: translateY(-50%) scale(1.08);
+        }
+        .home-btn:active {
+            transform: translateY(-50%) scale(0.94);
+        }
+        .home-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #ffd700;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .host-header {
@@ -568,6 +610,15 @@
                 font-size: 1.2rem;
                 padding: 4px 14px;
             }
+            .home-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            .home-btn svg {
+                width: 26px;
+                height: 26px;
+            }
         }
 
         @media (max-width: 600px) {
@@ -582,6 +633,16 @@
             .event-heading .sub-line {
                 font-size: 0.55rem;
                 letter-spacing: 3px;
+            }
+            .home-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+                right: -4px;
+            }
+            .home-btn svg {
+                width: 18px;
+                height: 18px;
             }
             .host-header {
                 flex-direction: column;
@@ -701,6 +762,15 @@
                 padding: 4px 8px;
                 min-height: 28px;
             }
+            .home-btn {
+                width: 28px;
+                height: 28px;
+                right: -2px;
+            }
+            .home-btn svg {
+                width: 14px;
+                height: 14px;
+            }
         }
     </style>
 </head>
@@ -710,6 +780,13 @@
         <div class="event-heading">
             <h1>NOORUSSALAM MADRASA.<br /><span style="font-size:0.7em;">QUIZ GRAND FINALE-AUDIENCE POLL</span></h1>
             <span class="sub-line">🏆 The Ultimate Showdown 🏆</span>
+
+            <!-- HOME BUTTON -->
+            <a href="index.html" class="home-btn" title="Go to Home">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+                </svg>
+            </a>
         </div>
 
         <div class="host-header">
