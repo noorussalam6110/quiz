@@ -1193,50 +1193,7 @@
                 projectorTimer.className = 'projector-timer';
             }
         }
-        // Lock availability
-        if (roundEnded || isEnded) {
-            isTimeUp = true;
-            if (!isLocked && currentMode === 'player' && optionsView.classList.contains('active')) {
-                optionBtns.forEach(b => b.disabled = true);
-                lockBtn.disabled = true;
-                lifelineBtn.disabled = true;
-                if (roundEnded) {
-                    lockBtn.textContent = '⏹ Locking Stopped';
-                    lifelineBtn.textContent = '⏹ Stopped';
-                } else {
-                    lockBtn.textContent = '⏰ Time\'s up';
-                    lifelineBtn.textContent = '⏰ Time\'s up';
-                }
-                lockBtn.classList.add('revealed');
-                lifelineBtn.classList.add('used');
-                if (roundEnded) {
-                    playerStatus.textContent = 'Locking has been stopped by admin.';
-                } else {
-                    playerStatus.textContent = 'Time is up! You cannot lock now.';
-                }
-                playerStatus.className = 'status-msg error';
-            }
-        } else {
-            isTimeUp = false;
-            if (!isLocked && !correctOption && currentMode === 'player' && optionsView.classList.contains('active') && roundStart) {
-                optionBtns.forEach(b => b.disabled = false);
-                if (selectedOption) lockBtn.disabled = false;
-                if (!usedLifeline && !lifelineRemovedOptions.length) {
-                    lifelineBtn.disabled = false;
-                } else {
-                    lifelineBtn.disabled = true;
-                }
-                if (!lockBtn.classList.contains('locked')) {
-                    lockBtn.textContent = '🔒 Lock';
-                    lockBtn.classList.remove('revealed');
-                }
-                if (!lifelineBtn.classList.contains('used')) {
-                    lifelineBtn.textContent = '💡 Lifeline (50:50)';
-                }
-                playerStatus.textContent = selectedOption ? `Selected: ${selectedOption}` : 'Select an option';
-                playerStatus.className = 'status-msg';
-            }
-        }
+        // Lock availability – will be updated in the listener
     }
 
     function startTimer() {
@@ -1334,7 +1291,7 @@
     lifelineBtn.addEventListener('click', useLifeline);
 
     // --------------------------------------------------------------
-    // 🧹 Reset Player State (for new round)
+    // 🧹 Reset Player State (for new round or end quiz)
     // --------------------------------------------------------------
     function resetPlayerState() {
         isLocked = false;
@@ -1373,46 +1330,11 @@
             optionsView.classList.add('active');
             // Reset local state when entering options view
             resetPlayerState();
-            // Check if user already locked, etc.
+            // Check if user already locked, etc. (listener will handle)
+            // But we need to trigger initial state fetch
             if (currentUser && lockData[currentUser.uid]) {
-                const existing = lockData[currentUser.uid];
-                isLocked = true;
-                selectedOption = existing.option;
-                optionBtns.forEach(b => {
-                    b.disabled = true;
-                    if (b.dataset.option === selectedOption) b.classList.add('selected');
-                });
-                lockBtn.disabled = true;
-                lockBtn.textContent = '✅ Locked';
-                lockBtn.classList.add('locked');
-                lifelineBtn.disabled = true;
-                playerStatus.textContent = `You locked ${selectedOption}`;
-                playerStatus.className = 'status-msg success';
-                if (correctOption) revealFeedback(selectedOption);
+                // Will be handled by listener
             }
-            if (isTimeUp && !isLocked) {
-                optionBtns.forEach(b => b.disabled = true);
-                lockBtn.disabled = true;
-                lifelineBtn.disabled = true;
-                lockBtn.textContent = roundEnded ? '⏹ Locking Stopped' : '⏰ Time\'s up';
-                lockBtn.classList.add('revealed');
-                lifelineBtn.textContent = roundEnded ? '⏹ Stopped' : '⏰ Time\'s up';
-                lifelineBtn.classList.add('used');
-                playerStatus.textContent = roundEnded ? 'Locking has been stopped.' : 'Time is up!';
-                playerStatus.className = 'status-msg error';
-            }
-            if (correctOption) {
-                optionBtns.forEach(b => b.disabled = true);
-                lockBtn.disabled = true;
-                lifelineBtn.disabled = true;
-                lockBtn.textContent = '🔒 Locked (Answer Revealed)';
-                lockBtn.classList.add('revealed');
-                lifelineBtn.textContent = '🔒 Revealed';
-                lifelineBtn.classList.add('used');
-                playerStatus.textContent = 'Answer already revealed.';
-                playerStatus.className = 'status-msg warning';
-            }
-            if (!timerInterval && roundStart) startTimer();
         } else {
             playerNameInput.focus();
             playerNameInput.style.borderColor = '#f87171';
@@ -1662,7 +1584,7 @@
     });
 
     // --------------------------------------------------------------
-    // 🔗 Firestore Listener (with auto‑reset on new round)
+    // 🔗 Firestore Listener (with full auto‑reset)
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1679,6 +1601,9 @@
                     resetPlayerState();
                     playerStatus.textContent = 'No round started yet.';
                     playerStatus.className = 'status-msg';
+                    optionBtns.forEach(b => b.disabled = true);
+                    lockBtn.disabled = true;
+                    lifelineBtn.disabled = true;
                 }
                 if (projectorOverlay.classList.contains('active')) renderProjector();
                 return;
@@ -1690,15 +1615,14 @@
             lockData = locks;
             correctOption = correct;
 
-            // 🔄 Detect new round: roundStart changed and is not null
+            // 🔄 Detect new round: roundStart changed from previous (not null) to a new timestamp
             const newRoundStarted = (start !== null && prevRoundStart !== null && start.seconds !== prevRoundStart.seconds);
             if (newRoundStarted) {
                 // Reset player state for new round
                 if (currentMode === 'player' && optionsView.classList.contains('active') && !lockData[currentUser?.uid]) {
-                    // Only reset if player is not locked in this new round
                     resetPlayerState();
-                    // If the player is already in options view, show active state
-                    if (roundStart && !isTimeUp && !correctOption) {
+                    // Re‑enable options if round is active and not ended
+                    if (!roundEnded && !isTimeUp && !correctOption) {
                         optionBtns.forEach(b => b.disabled = false);
                         lifelineBtn.disabled = false;
                         lockBtn.disabled = true;
@@ -1707,21 +1631,62 @@
                     }
                 }
             }
+
+            // Detect if round ended (start becomes null)
+            const roundEndedNow = (start === null && prevRoundStart !== null);
+            if (roundEndedNow) {
+                // Round has ended (either by admin stopping or ending quiz)
+                // Check if there are any locks (if locks exist, it's a stop-locking scenario; else it's end quiz)
+                const hasLocks = Object.keys(locks).length > 0;
+                if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                    const myLock = currentUser ? locks[currentUser.uid] : null;
+                    if (myLock) {
+                        // Player is locked – show locked state (listener will handle)
+                    } else {
+                        // Player not locked
+                        if (!hasLocks) {
+                            // No locks at all – End Quiz scenario
+                            resetPlayerState();
+                            optionBtns.forEach(b => b.disabled = true);
+                            lockBtn.disabled = true;
+                            lifelineBtn.disabled = true;
+                            playerStatus.textContent = 'No round started yet.';
+                            playerStatus.className = 'status-msg';
+                        } else {
+                            // There are locks – Stop Locking scenario
+                            resetPlayerState(); // clear selection and lifeline
+                            optionBtns.forEach(b => b.disabled = true);
+                            lockBtn.disabled = true;
+                            lifelineBtn.disabled = true;
+                            lockBtn.textContent = '⏹ Locking Stopped';
+                            lockBtn.classList.add('revealed');
+                            lifelineBtn.textContent = '⏹ Stopped';
+                            lifelineBtn.classList.add('used');
+                            playerStatus.textContent = 'Locking has been stopped by admin.';
+                            playerStatus.className = 'status-msg error';
+                        }
+                    }
+                }
+                // Set local flags
+                roundEnded = true;
+                isTimeUp = true;
+                stopTimer();
+                // Update timer display
+                updateTimerDisplay();
+            }
+
             prevRoundStart = start;
             roundStart = start;
 
-            // Timer management
+            // Timer management (if round active)
             if (roundStart && !roundEnded) {
                 if (!timerInterval) startTimer();
             } else if (!roundStart) {
-                stopTimer();
-                isTimeUp = false;
-                roundEnded = false;
-                if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
-                if (projectorTimer) { projectorTimer.textContent = '⏱ --'; projectorTimer.className = 'projector-timer'; }
+                // Already handled above, but ensure timer is stopped
+                if (timerInterval) stopTimer();
             }
 
-            // Player UI
+            // Player UI – handle locked state and normal active round
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 const myLock = currentUser ? locks[currentUser.uid] : null;
                 if (myLock) {
@@ -1746,31 +1711,11 @@
                         revealFeedback(myLock.option);
                     }
                 } else {
-                    // Player not locked
-                    if (correctOption) {
-                        optionBtns.forEach(b => b.disabled = true);
-                        lockBtn.disabled = true;
-                        lifelineBtn.disabled = true;
-                        lockBtn.textContent = '🔒 Locked (Answer Revealed)';
-                        lockBtn.classList.add('revealed');
-                        lifelineBtn.textContent = '🔒 Revealed';
-                        lifelineBtn.classList.add('used');
-                        playerStatus.textContent = 'Answer already revealed.';
-                        playerStatus.className = 'status-msg warning';
-                    } else if (isTimeUp || roundEnded) {
-                        optionBtns.forEach(b => b.disabled = true);
-                        lockBtn.disabled = true;
-                        lifelineBtn.disabled = true;
-                        lockBtn.textContent = roundEnded ? '⏹ Locking Stopped' : '⏰ Time\'s up';
-                        lockBtn.classList.add('revealed');
-                        lifelineBtn.textContent = roundEnded ? '⏹ Stopped' : '⏰ Time\'s up';
-                        lifelineBtn.classList.add('used');
-                        playerStatus.textContent = roundEnded ? 'Locking has been stopped.' : 'Time is up!';
-                        playerStatus.className = 'status-msg error';
-                    } else {
-                        // Round active, player can select
-                        if (!isLocked) {
-                            // Re-apply lifeline removal if any
+                    // Player not locked – but only if round is active (roundStart not null and not ended)
+                    if (roundStart && !roundEnded && !isTimeUp) {
+                        // Active round, player can select
+                        if (!correctOption) {
+                            // Re‑apply lifeline removal if any
                             if (lifelineRemovedOptions.length) {
                                 optionBtns.forEach(b => {
                                     if (lifelineRemovedOptions.includes(b.dataset.option)) {
@@ -1811,7 +1756,19 @@
                             }
                             playerStatus.textContent = selectedOption ? `Selected: ${selectedOption}` : 'Select an option';
                             playerStatus.className = 'status-msg';
+                        } else {
+                            // Correct option already revealed – disable everything
+                            optionBtns.forEach(b => b.disabled = true);
+                            lockBtn.disabled = true;
+                            lifelineBtn.disabled = true;
+                            playerStatus.textContent = 'Answer already revealed.';
+                            playerStatus.className = 'status-msg warning';
                         }
+                    } else if (roundStart && roundEnded) {
+                        // Round ended (stop locking or timer expired) – already handled above
+                        // but ensure UI is consistent
+                    } else {
+                        // No active round (roundStart null) – already handled
                     }
                 }
             }
@@ -2065,6 +2022,8 @@
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { roundStart: null }, { merge: true });
+            // The listener will handle the UI update
+            // Also force local stop for immediate effect
             forceStopLocking();
             alert('Locking stopped!');
         } catch (error) {
@@ -2094,11 +2053,7 @@
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { locks: {}, roundStart: null, correctOption: null }, { merge: true });
             alert('Quiz ended. All data cleared.');
-            if (currentMode === 'player' && optionsView.classList.contains('active')) {
-                resetPlayerState();
-                stopTimer();
-                if (playerTimer) { playerTimer.textContent = '⏱ --'; playerTimer.className = 'timer-display'; }
-            }
+            // The listener will reset player state
             if (projectorOverlay.classList.contains('active')) {
                 projectorOverlay.classList.remove('active');
                 if (particleRunning) {
@@ -2193,7 +2148,7 @@
         }
     });
 
-    console.log('Quiz Lock System – with Lifeline (50:50) & Auto‑Reset');
+    console.log('Quiz Lock System – with full auto‑reset on End Quiz');
 </script>
 </body>
 </html>
