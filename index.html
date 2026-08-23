@@ -509,6 +509,16 @@
             0% { opacity: 0; transform: translateY(-10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+        .option-column .player-name .lifeline-badge {
+            display: inline-block;
+            background: #8b5cf6;
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 30px;
+            margin-left: 6px;
+            font-weight: 600;
+        }
         .option-column.col-A .col-header { background: #22c55e; }
         .option-column.col-B .col-header { background: #3b82f6; }
         .option-column.col-C .col-header { background: #eab308; }
@@ -546,6 +556,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
         @keyframes cardIn {
             0% { opacity: 0; transform: scale(0.8); }
@@ -558,6 +569,19 @@
         .player-list-card .pl-option.opt-C { color: #eab308; text-shadow: 0 0 30px rgba(234,179,8,0.3); }
         .player-list-card .pl-option.opt-D { color: #ef4444; text-shadow: 0 0 30px rgba(239,68,68,0.3); }
         .player-list-card .pl-time { font-size: 0.7rem; color: #64748b; margin-top: 4px; }
+        .player-list-card .pl-lifeline-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #8b5cf6;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(139,92,246,0.4);
+            border: 2px solid #6d28d9;
+        }
         .player-list-card.card-correct { border-color: #22c55e; background: rgba(34,197,94,0.08); box-shadow: 0 0 30px rgba(34,197,94,0.1); }
         .player-list-card.card-wrong { border-color: #ef4444; background: rgba(239,68,68,0.08); box-shadow: 0 0 30px rgba(239,68,68,0.1); }
         .player-list-card .pl-status { font-size: 0.8rem; font-weight: 600; margin-top: 4px; }
@@ -751,6 +775,10 @@
             font-size: 1.6rem;
             padding: 6px 18px;
         }
+        .projector-body .option-column .player-name .lifeline-badge {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+        }
 
         .projector-body .player-list-grid {
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -769,6 +797,10 @@
         }
         .projector-body .player-list-card .pl-time {
             font-size: 0.9rem;
+        }
+        .projector-body .player-list-card .pl-lifeline-badge {
+            font-size: 0.8rem;
+            padding: 6px 14px;
         }
 
         .projector-exit {
@@ -1094,6 +1126,7 @@
     let selectedOption = null;
     let isLocked = false;
     let lockData = {};
+    let lifelineUsage = {};
     let correctOption = null;
     let hasShownFeedback = false;
     let viewMode = 'group';
@@ -1167,7 +1200,6 @@
         const remaining = getRemainingSeconds();
         const seconds = Math.ceil(remaining);
         const isEnded = seconds <= 0 || roundEnded;
-        // Player timer
         if (playerTimer) {
             if (roundEnded) {
                 playerTimer.textContent = '⏱ Locking Stopped';
@@ -1180,7 +1212,6 @@
                 playerTimer.className = 'timer-display';
             }
         }
-        // Projector timer
         if (projectorTimer) {
             if (roundEnded) {
                 projectorTimer.textContent = '⏱ LOCKING STOPPED';
@@ -1209,34 +1240,21 @@
         }
     }
 
-    function forceStopLocking() {
-        roundEnded = true;
-        isTimeUp = true;
-        stopTimer();
-        updateTimerDisplay();
-        if (currentMode === 'player' && optionsView.classList.contains('active')) {
-            optionBtns.forEach(b => b.disabled = true);
-            lockBtn.disabled = true;
-            lifelineBtn.disabled = true;
-            lockBtn.textContent = '⏹ Locking Stopped';
-            lockBtn.classList.add('revealed');
-            lifelineBtn.textContent = '⏹ Stopped';
-            lifelineBtn.classList.add('used');
-            playerStatus.textContent = 'Locking has been stopped by admin.';
-            playerStatus.className = 'status-msg error';
-        }
-        if (projectorOverlay.classList.contains('active')) {
-            updateTimerDisplay();
-        }
-    }
-
     // --------------------------------------------------------------
-    // 🧠 Lifeline logic
+    // 🧠 Lifeline logic – now stores usage in Firestore
     // --------------------------------------------------------------
-    function useLifeline() {
+    async function useLifeline() {
         if (usedLifeline || isTimeUp || isLocked || correctOption) return;
+        if (!currentUser) {
+            playerStatus.textContent = 'Not logged in.';
+            playerStatus.className = 'status-msg error';
+            return;
+        }
+
         const available = OPTIONS.filter(opt => !lifelineRemovedOptions.includes(opt));
         if (available.length <= 2) return;
+
+        // Randomly select two to remove
         const shuffled = [...available].sort(() => Math.random() - 0.5);
         const toRemove = shuffled.slice(0, 2);
         lifelineRemovedOptions = [...lifelineRemovedOptions, ...toRemove];
@@ -1245,6 +1263,7 @@
         lifelineBtn.textContent = '✅ Used';
         lifelineBtn.classList.add('used');
 
+        // Update UI: hide removed options
         optionBtns.forEach(btn => {
             const opt = btn.dataset.option;
             if (lifelineRemovedOptions.includes(opt)) {
@@ -1263,6 +1282,24 @@
             playerStatus.textContent = 'Your option was removed. Choose again.';
             playerStatus.className = 'status-msg warning';
         }
+
+        // 🔥 Store lifeline usage in Firestore so admin can see it
+        try {
+            const roomRef = doc(db, 'rooms', ROOM_ID);
+            const docSnap = await getDoc(roomRef);
+            let currentUsage = docSnap.exists() ? (docSnap.data().lifelineUsage || {}) : {};
+            if (!currentUsage[currentUser.uid]) {
+                currentUsage[currentUser.uid] = {
+                    playerName: playerName,
+                    timestamp: Timestamp.now()
+                };
+                await setDoc(roomRef, { lifelineUsage: currentUsage }, { merge: true });
+            }
+        } catch (e) {
+            console.warn('Could not save lifeline usage:', e);
+        }
+
+        // Play sound
         try {
             const ctx = getAudioContext();
             const osc = ctx.createOscillator();
@@ -1282,7 +1319,7 @@
     lifelineBtn.addEventListener('click', useLifeline);
 
     // --------------------------------------------------------------
-    // 🧹 Reset Player State (for new round or end quiz)
+    // 🧹 Reset Player State
     // --------------------------------------------------------------
     function resetPlayerState() {
         isLocked = false;
@@ -1566,7 +1603,7 @@
     });
 
     // --------------------------------------------------------------
-    // 🔗 Firestore Listener (with full auto‑reset on new round)
+    // 🔗 Firestore Listener (with lifeline usage)
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1574,6 +1611,7 @@
         unsubscribeSnapshot = onSnapshot(roomRef, (docSnap) => {
             if (!docSnap.exists()) {
                 lockData = {};
+                lifelineUsage = {};
                 correctOption = null;
                 roundStart = null;
                 prevRoundStart = null;
@@ -1592,18 +1630,18 @@
             }
             const data = docSnap.data();
             const locks = data.locks || {};
+            const usage = data.lifelineUsage || {};
             const correct = data.correctOption || null;
             const start = data.roundStart || null;
             lockData = locks;
+            lifelineUsage = usage;
             correctOption = correct;
 
-            // 🔄 Detect new round – including first round after null
+            // Detect new round
             const newRoundStarted = (start !== null && (prevRoundStart === null || start.seconds !== prevRoundStart.seconds));
             if (newRoundStarted) {
-                // Reset player state for new round
                 if (currentMode === 'player' && optionsView.classList.contains('active') && !lockData[currentUser?.uid]) {
                     resetPlayerState();
-                    // Re‑enable options if round is active and not ended
                     if (!roundEnded && !isTimeUp && !correctOption) {
                         optionBtns.forEach(b => b.disabled = false);
                         lifelineBtn.disabled = false;
@@ -1614,13 +1652,11 @@
                 }
             }
 
-            // Detect if round ended (start becomes null)
             const roundEndedNow = (start === null && prevRoundStart !== null);
             if (roundEndedNow) {
                 const hasLocks = Object.keys(locks).length > 0;
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     if (!hasLocks) {
-                        // End Quiz – reset all players
                         resetPlayerState();
                         optionBtns.forEach(b => b.disabled = true);
                         lockBtn.disabled = true;
@@ -1628,7 +1664,6 @@
                         playerStatus.textContent = 'No round started yet.';
                         playerStatus.className = 'status-msg';
                     } else {
-                        // Stop Locking – reset only if not locked
                         const myLock = currentUser ? locks[currentUser.uid] : null;
                         if (!myLock) {
                             resetPlayerState();
@@ -1643,7 +1678,6 @@
                             playerStatus.className = 'status-msg error';
                         } else {
                             // Player is locked – keep locked state
-                            // The lock UI is already set by the myLock branch below
                         }
                     }
                 }
@@ -1656,18 +1690,16 @@
             prevRoundStart = start;
             roundStart = start;
 
-            // Timer management
             if (roundStart && !roundEnded) {
                 if (!timerInterval) startTimer();
             } else if (!roundStart) {
                 if (timerInterval) stopTimer();
             }
 
-            // Player UI – handle locked state and normal active round
+            // Player UI
             if (currentMode === 'player' && optionsView.classList.contains('active')) {
                 const myLock = currentUser ? locks[currentUser.uid] : null;
                 if (myLock) {
-                    // Player is locked
                     if (!isLocked) {
                         isLocked = true;
                         selectedOption = myLock.option;
@@ -1688,9 +1720,7 @@
                         revealFeedback(myLock.option);
                     }
                 } else {
-                    // Player not locked
                     if (roundStart && !roundEnded && !isTimeUp) {
-                        // Active round, player can select
                         if (!correctOption) {
                             if (lifelineRemovedOptions.length) {
                                 optionBtns.forEach(b => {
@@ -1741,29 +1771,21 @@
                     } else if (roundStart && roundEnded) {
                         // Already handled
                     } else {
-                        // No active round – already handled
+                        // No active round
                     }
                 }
             }
 
-            // Admin view
             if (currentMode === 'admin') renderAdminView();
-
-            // Projector view
-            if (projectorOverlay.classList.contains('active')) {
-                renderProjector();
-                updateTimerDisplay();
-            }
+            if (projectorOverlay.classList.contains('active')) renderProjector();
         }, (error) => {
             console.error('Listener error:', error);
         });
     }
 
     // --------------------------------------------------------------
-    // 📊 Render functions
+    // 📊 Render functions (with lifeline badge)
     // --------------------------------------------------------------
-    let previousLockKeys = new Set();
-
     function getDisplayData() {
         const entries = Object.values(lockData);
         const total = entries.length;
@@ -1791,9 +1813,11 @@
                 const color = OPTION_COLORS[opt] || '#94a3b8';
                 const isCorrect = (correctOption === opt);
                 const correctClass = isCorrect ? 'correct-option' : '';
-                const nameList = players.map(p => 
-                    `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
-                ).join('');
+                const nameList = players.map(p => {
+                    const hasLifeline = lifelineUsage[p.userId] ? true : false;
+                    const badge = hasLifeline ? '<span class="lifeline-badge">💡</span>' : '';
+                    return `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
+                }).join('');
                 html += `
                     <div class="option-column col-${opt} ${correctClass}">
                         <div class="col-header" style="background:${color};">${opt}</div>
@@ -1819,8 +1843,11 @@
                     if (isCorrect) { statusClass = 'card-correct'; statusText = '✅ Correct'; }
                     else if (isWrong) { statusClass = 'card-wrong'; statusText = '❌ Wrong'; }
                     const optClass = `opt-${opt}`;
+                    const hasLifeline = lifelineUsage[entry.userId] ? true : false;
+                    const badge = hasLifeline ? `<div class="pl-lifeline-badge">💡 Lifeline</div>` : '';
                     html += `
                         <div class="player-list-card ${statusClass}">
+                            ${badge}
                             <div class="pl-name">${name}</div>
                             <div class="pl-option ${optClass}">${opt}</div>
                             ${statusText ? `<div class="pl-status ${statusClass}">${statusText}</div>` : ''}
@@ -1839,8 +1866,6 @@
         totalCount.textContent = total;
         lockedCount.textContent = locked;
 
-        previousLockKeys = new Set(Object.keys(lockData));
-
         let html = '';
         if (viewMode === 'group') {
             const groups = { A: [], B: [], C: [], D: [] };
@@ -1856,9 +1881,11 @@
                 const color = OPTION_COLORS[opt] || '#94a3b8';
                 const isCorrect = (correctOption === opt);
                 const correctClass = isCorrect ? 'correct-option' : '';
-                const nameList = players.map(p => 
-                    `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'}</div>`
-                ).join('');
+                const nameList = players.map(p => {
+                    const hasLifeline = lifelineUsage[p.userId] ? true : false;
+                    const badge = hasLifeline ? '<span class="lifeline-badge">💡</span>' : '';
+                    return `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
+                }).join('');
                 html += `
                     <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
                         <div class="col-header" style="background:${color};">${opt}</div>
@@ -1897,8 +1924,11 @@
                     if (isCorrect) { statusClass = 'card-correct'; statusText = '✅ Correct'; }
                     else if (isWrong) { statusClass = 'card-wrong'; statusText = '❌ Wrong'; }
                     const optClass = `opt-${opt}`;
+                    const hasLifeline = lifelineUsage[entry.userId] ? true : false;
+                    const badge = hasLifeline ? `<div class="pl-lifeline-badge">💡 Lifeline</div>` : '';
                     html += `
                         <div class="player-list-card ${statusClass}">
+                            ${badge}
                             <div class="pl-name">${name}</div>
                             <div class="pl-option ${optClass}">${opt}</div>
                             ${statusText ? `<div class="pl-status ${statusClass}">${statusText}</div>` : ''}
@@ -1978,6 +2008,7 @@
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, {
                 locks: {},
+                lifelineUsage: {},
                 roundStart: Timestamp.now(),
                 correctOption: null
             }, { merge: true });
@@ -1995,7 +2026,21 @@
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
             await setDoc(roomRef, { roundStart: null }, { merge: true });
-            forceStopLocking();
+            roundEnded = true;
+            isTimeUp = true;
+            stopTimer();
+            updateTimerDisplay();
+            if (currentMode === 'player' && optionsView.classList.contains('active')) {
+                optionBtns.forEach(b => b.disabled = true);
+                lockBtn.disabled = true;
+                lifelineBtn.disabled = true;
+                lockBtn.textContent = '⏹ Locking Stopped';
+                lockBtn.classList.add('revealed');
+                lifelineBtn.textContent = '⏹ Stopped';
+                lifelineBtn.classList.add('used');
+                playerStatus.textContent = 'Locking has been stopped by admin.';
+                playerStatus.className = 'status-msg error';
+            }
             alert('Locking stopped!');
         } catch (error) {
             alert('Failed to stop locking: ' + error.message);
@@ -2022,7 +2067,7 @@
         if (!confirm('This will clear ALL data (including past rounds). Are you sure?')) return;
         try {
             const roomRef = doc(db, 'rooms', ROOM_ID);
-            await setDoc(roomRef, { locks: {}, roundStart: null, correctOption: null }, { merge: true });
+            await setDoc(roomRef, { locks: {}, lifelineUsage: {}, roundStart: null, correctOption: null }, { merge: true });
             alert('Quiz ended. All data cleared.');
             if (projectorOverlay.classList.contains('active')) {
                 projectorOverlay.classList.remove('active');
@@ -2041,7 +2086,7 @@
     refreshBtn.addEventListener('click', () => { connectToRoom(ROOM_ID); });
 
     // --------------------------------------------------------------
-    // 🎨 Particle system for projector
+    // 🎨 Particle system
     // --------------------------------------------------------------
     let particles = [];
     let particleRunning = false;
@@ -2118,7 +2163,7 @@
         }
     });
 
-    console.log('Quiz Lock System – Full Auto‑Reset on New Round');
+    console.log('Quiz Lock System – with Lifeline Tracking for Admin');
 </script>
 </body>
 </html>
