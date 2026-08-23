@@ -281,23 +281,27 @@
             transform: scale(0.95);
         }
 
-        /* Lifeline button – separate from options */
+        /* Lifeline button – stylish */
         .lifeline-btn {
-            padding: 16px 28px;
+            padding: 14px 28px;
             border-radius: 60px;
             border: none;
-            background: linear-gradient(135deg, #f472b6, #db2777);
+            background: linear-gradient(135deg, #ec4899, #db2777);
             color: #fff;
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 8px 0 #9d174d;
+            box-shadow: 0 8px 0 #9d174d, 0 0 30px rgba(236, 72, 153, 0.3);
             transition: all 0.15s ease;
             letter-spacing: 1px;
             font-family: 'Anek Malayalam', sans-serif;
             width: 100%;
             max-width: 300px;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .lifeline-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 4px 0 #9d174d; }
         .lifeline-btn:disabled {
@@ -309,6 +313,14 @@
         .lifeline-btn.used {
             background: #475569;
             box-shadow: 0 8px 0 #334155;
+        }
+        .lifeline-btn.pop {
+            animation: pop 0.3s ease;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
         }
 
         .lock-area {
@@ -406,6 +418,8 @@
             display: block;
             margin-top: 2px;
         }
+        .admin-stat-card.lifeline-card { border-left-color: #ec4899; }
+        .admin-stat-card.lifeline-card span { color: #ec4899; }
 
         .admin-display-area {
             flex: 1;
@@ -472,20 +486,27 @@
             overflow: hidden;
             text-overflow: ellipsis;
             animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
+            transition: all 0.3s ease;
         }
         .option-column .player-name .lifeline-badge {
             display: inline-block;
-            background: #f472b6;
+            background: #ec4899;
             color: #fff;
             font-size: 0.6rem;
-            padding: 2px 8px;
+            padding: 2px 10px;
             border-radius: 30px;
             margin-left: 6px;
             font-weight: 600;
+            animation: pulse-badge 1s ease infinite;
+        }
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .option-column .player-name.lifeline-user {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid #ec4899;
         }
         .option-column.col-A .col-header { background: #22c55e; }
         .option-column.col-B .col-header { background: #3b82f6; }
@@ -542,14 +563,19 @@
             position: absolute;
             top: -8px;
             right: -8px;
-            background: #f472b6;
+            background: #ec4899;
             color: #fff;
             font-size: 0.65rem;
             font-weight: 700;
             padding: 4px 10px;
             border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(244,114,182,0.4);
+            box-shadow: 0 4px 15px rgba(236,72,153,0.4);
             border: 2px solid #db2777;
+            animation: pulse-badge 1.5s ease infinite;
+        }
+        .player-list-card.lifeline-glow {
+            border-color: #ec4899;
+            box-shadow: 0 0 30px rgba(236,72,153,0.2);
         }
         .player-list-card.card-correct { border-color: #22c55e; background: rgba(34,197,94,0.08); box-shadow: 0 0 30px rgba(34,197,94,0.1); }
         .player-list-card.card-wrong { border-color: #ef4444; background: rgba(239,68,68,0.08); box-shadow: 0 0 30px rgba(239,68,68,0.1); }
@@ -693,6 +719,9 @@
             color: #facc15;
             font-weight: 700;
         }
+        .projector-stats .stat-item.lifeline-stat span {
+            color: #ec4899;
+        }
 
         .projector-timer {
             text-align: center;
@@ -798,6 +827,57 @@
             transform: scale(1.05);
         }
 
+        /* ----- Lifeline Notification (Admin/Projector) ----- */
+        .lifeline-notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9997;
+            animation: notifFadeIn 0.4s ease;
+            padding: 30px;
+            text-align: center;
+        }
+        .lifeline-notification.active { display: flex; }
+        @keyframes notifFadeIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .lifeline-notification .lifeline-icon {
+            font-size: 8rem;
+            animation: lifelinePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes lifelinePop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .lifeline-notification .lifeline-name {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #facc15;
+            margin-top: 10px;
+            animation: nameSlide 0.5s ease 0.2s both;
+        }
+        @keyframes nameSlide {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .lifeline-notification .lifeline-label {
+            font-size: 2rem;
+            color: #ec4899;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            animation: nameSlide 0.5s ease 0.4s both;
+        }
+
         /* ----- Password Modal ----- */
         #passwordModal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -883,6 +963,9 @@
             .projector-timer { font-size: 3rem; }
             .lock-area { flex-direction: column; align-items: center; }
             .lifeline-btn { width: 100%; max-width: 300px; }
+            .lifeline-notification .lifeline-icon { font-size: 5rem; }
+            .lifeline-notification .lifeline-name { font-size: 3.5rem; }
+            .lifeline-notification .lifeline-label { font-size: 1.5rem; }
         }
         @media (max-width: 480px) {
             .splash-title { font-size: 1.5rem; }
@@ -924,6 +1007,13 @@
         <button id="loginAdminBtn">Unlock</button>
         <span id="loginError" class="error-msg"></span>
     </div>
+</div>
+
+<!-- Lifeline Notification (Admin/Projector) -->
+<div class="lifeline-notification" id="lifelineNotification">
+    <div class="lifeline-label">🆘 Lifeline Used</div>
+    <div class="lifeline-icon">🆘</div>
+    <div class="lifeline-name" id="lifelineNotifName">Player</div>
 </div>
 
 <!-- Main Container -->
@@ -977,6 +1067,7 @@
         <div class="admin-stats">
             <div class="admin-stat-card"><label>Total Players</label><span id="totalCount">0</span></div>
             <div class="admin-stat-card"><label>Locked</label><span id="lockedCount">0</span></div>
+            <div class="admin-stat-card lifeline-card"><label>🆘 Lifelines Used</label><span id="lifelineCount">0</span></div>
         </div>
         <div class="admin-display-area" id="adminDisplayArea">
             <!-- Rendered by JS -->
@@ -991,7 +1082,7 @@
             <button class="btn btn-danger" id="endQuizBtn">⏹ End Quiz</button>
         </div>
         <p style="color:#64748b; font-size:0.55rem; text-align:center; margin-top:4px; opacity:0.6;">
-            Click an option column (A/B/C/D) to mark it as correct. "Time to lock up" starts 15s timer. "Stop Locking" ends it immediately.
+            Click an option column (A/B/C/D) to mark it as correct. "Time to lock up" starts 15s timer.
         </p>
     </div>
 </div>
@@ -1008,6 +1099,7 @@
     <div class="projector-stats" id="projectorStats">
         <div class="stat-item">👥 Total: <span id="projTotal">0</span></div>
         <div class="stat-item">🔒 Locked: <span id="projLocked">0</span></div>
+        <div class="stat-item lifeline-stat">🆘 Lifelines: <span id="projLifeline">0</span></div>
     </div>
     <div class="projector-body" id="projectorBody">
         <!-- Rendered by JS -->
@@ -1061,6 +1153,22 @@
             osc.stop(ctx.currentTime + 0.2);
         } catch (e) {}
     }
+    function playLifelineSound() {
+        try {
+            const ctx = getAudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(660, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+        } catch (e) {}
+    }
     function triggerVibration() {
         if (navigator.vibrate) navigator.vibrate(200);
     }
@@ -1107,6 +1215,7 @@
     let roundEnded = false;
     let prevRoundStart = null;
     let usedLifeline = false;
+    let lifelineNotifTimeout = null;
 
     // --------------------------------------------------------------
     // DOM Elements
@@ -1133,6 +1242,7 @@
 
     const totalCount = document.getElementById('totalCount');
     const lockedCount = document.getElementById('lockedCount');
+    const lifelineCount = document.getElementById('lifelineCount');
     const adminDisplayArea = document.getElementById('adminDisplayArea');
     const startRoundBtn = document.getElementById('startRoundBtn');
     const stopLockingBtn = document.getElementById('stopLockingBtn');
@@ -1148,9 +1258,14 @@
     const projectorBody = document.getElementById('projectorBody');
     const projTotal = document.getElementById('projTotal');
     const projLocked = document.getElementById('projLocked');
+    const projLifeline = document.getElementById('projLifeline');
     const projectorTimer = document.getElementById('projectorTimer');
     const particleCanvas = document.getElementById('projectorParticles');
     const ctx = particleCanvas.getContext('2d');
+
+    // Lifeline notification
+    const lifelineNotif = document.getElementById('lifelineNotification');
+    const lifelineNotifName = document.getElementById('lifelineNotifName');
 
     roomBadge.textContent = `Room: ${ROOM_ID}`;
     if (IS_MOBILE) adminToggleBtn.classList.add('mobile-hidden');
@@ -1211,7 +1326,7 @@
     }
 
     // --------------------------------------------------------------
-    // 🧠 Lifeline logic – separate button, stores usage
+    // 🧠 Lifeline logic – separate button, stores usage & triggers notification
     // --------------------------------------------------------------
     async function useLifeline() {
         if (usedLifeline || isTimeUp || isLocked || correctOption) return;
@@ -1225,6 +1340,9 @@
         lifelineBtn.disabled = true;
         lifelineBtn.textContent = '✅ Used';
         lifelineBtn.classList.add('used');
+        lifelineBtn.classList.remove('pop');
+        void lifelineBtn.offsetWidth;
+        lifelineBtn.classList.add('pop');
 
         // 🔥 Store lifeline usage in Firestore
         try {
@@ -1242,21 +1360,9 @@
             console.warn('Could not save lifeline usage:', e);
         }
 
-        // Play sound
-        try {
-            const ctx = getAudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(500, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.2);
-        } catch (e) {}
+        // Play sound & vibrate
+        playLifelineSound();
+        triggerVibration();
 
         playerStatus.textContent = '✅ Lifeline used!';
         playerStatus.className = 'status-msg success';
@@ -1539,11 +1645,13 @@
     });
 
     // --------------------------------------------------------------
-    // 🔗 Firestore Listener (with lifeline usage)
+    // 🔗 Firestore Listener (with lifeline usage & notifications)
     // --------------------------------------------------------------
     function connectToRoom(roomId) {
         if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
         const roomRef = doc(db, 'rooms', roomId);
+        let previousLifelineKeys = new Set();
+
         unsubscribeSnapshot = onSnapshot(roomRef, (docSnap) => {
             if (!docSnap.exists()) {
                 lockData = {};
@@ -1552,6 +1660,7 @@
                 roundStart = null;
                 prevRoundStart = null;
                 stopTimer();
+                previousLifelineKeys = new Set();
                 if (currentMode === 'admin') renderAdminView();
                 if (currentMode === 'player' && optionsView.classList.contains('active')) {
                     resetPlayerState();
@@ -1572,6 +1681,25 @@
             lockData = locks;
             lifelineUsage = usage;
             correctOption = correct;
+
+            // Detect new lifeline usage for notification
+            const currentLifelineKeys = new Set(Object.keys(usage));
+            const newLifelineKeys = [...currentLifelineKeys].filter(k => !previousLifelineKeys.has(k));
+            if (newLifelineKeys.length > 0 && (currentMode === 'admin' || projectorOverlay.classList.contains('active'))) {
+                const newestId = newLifelineKeys[newLifelineKeys.length - 1];
+                const entry = usage[newestId];
+                if (entry) {
+                    lifelineNotifName.textContent = entry.playerName || 'Player';
+                    lifelineNotif.classList.add('active');
+                    playLifelineSound();
+                    if (lifelineNotifTimeout) clearTimeout(lifelineNotifTimeout);
+                    lifelineNotifTimeout = setTimeout(() => {
+                        lifelineNotif.classList.remove('active');
+                        lifelineNotifTimeout = null;
+                    }, 3000);
+                }
+            }
+            previousLifelineKeys = currentLifelineKeys;
 
             // Detect new round
             const newRoundStarted = (start !== null && (prevRoundStart === null || start.seconds !== prevRoundStart.seconds));
@@ -1695,19 +1823,21 @@
     }
 
     // --------------------------------------------------------------
-    // 📊 Render functions (with lifeline badge)
+    // 📊 Render functions (with lifeline highlights)
     // --------------------------------------------------------------
     function getDisplayData() {
         const entries = Object.values(lockData);
         const total = entries.length;
         const locked = entries.filter(e => e.option).length;
-        return { entries, total, locked, sorted: [...entries].sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0)) };
+        const lifelineUsed = Object.keys(lifelineUsage).length;
+        return { entries, total, locked, lifelineUsed, sorted: [...entries].sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0)) };
     }
 
     function renderProjector() {
-        const { entries, total, locked, sorted } = getDisplayData();
+        const { entries, total, locked, lifelineUsed, sorted } = getDisplayData();
         projTotal.textContent = total;
         projLocked.textContent = locked;
+        projLifeline.textContent = lifelineUsed;
 
         let html = '';
         if (viewMode === 'group') {
@@ -1727,7 +1857,8 @@
                 const nameList = players.map(p => {
                     const hasLifeline = lifelineUsage[p.userId] ? true : false;
                     const badge = hasLifeline ? '<span class="lifeline-badge">🆘</span>' : '';
-                    return `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
+                    const lifelineClass = hasLifeline ? ' lifeline-user' : '';
+                    return `<div class="player-name${lifelineClass}" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
                 }).join('');
                 html += `
                     <div class="option-column col-${opt} ${correctClass}">
@@ -1756,8 +1887,9 @@
                     const optClass = `opt-${opt}`;
                     const hasLifeline = lifelineUsage[entry.userId] ? true : false;
                     const badge = hasLifeline ? `<div class="pl-lifeline-badge">🆘 Lifeline</div>` : '';
+                    const glowClass = hasLifeline ? ' lifeline-glow' : '';
                     html += `
-                        <div class="player-list-card ${statusClass}">
+                        <div class="player-list-card ${statusClass}${glowClass}">
                             ${badge}
                             <div class="pl-name">${name}</div>
                             <div class="pl-option ${optClass}">${opt}</div>
@@ -1773,9 +1905,10 @@
     }
 
     function renderAdminView() {
-        const { entries, total, locked, sorted } = getDisplayData();
+        const { entries, total, locked, lifelineUsed, sorted } = getDisplayData();
         totalCount.textContent = total;
         lockedCount.textContent = locked;
+        lifelineCount.textContent = lifelineUsed;
 
         let html = '';
         if (viewMode === 'group') {
@@ -1795,7 +1928,8 @@
                 const nameList = players.map(p => {
                     const hasLifeline = lifelineUsage[p.userId] ? true : false;
                     const badge = hasLifeline ? '<span class="lifeline-badge">🆘</span>' : '';
-                    return `<div class="player-name" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
+                    const lifelineClass = hasLifeline ? ' lifeline-user' : '';
+                    return `<div class="player-name${lifelineClass}" style="border-left: 4px solid ${color};">${p.playerName || 'Anonymous'} ${badge}</div>`;
                 }).join('');
                 html += `
                     <div class="option-column col-${opt} ${correctClass}" data-option="${opt}">
@@ -1837,8 +1971,9 @@
                     const optClass = `opt-${opt}`;
                     const hasLifeline = lifelineUsage[entry.userId] ? true : false;
                     const badge = hasLifeline ? `<div class="pl-lifeline-badge">🆘 Lifeline</div>` : '';
+                    const glowClass = hasLifeline ? ' lifeline-glow' : '';
                     html += `
-                        <div class="player-list-card ${statusClass}">
+                        <div class="player-list-card ${statusClass}${glowClass}">
                             ${badge}
                             <div class="pl-name">${name}</div>
                             <div class="pl-option ${optClass}">${opt}</div>
@@ -1897,6 +2032,10 @@
             cancelAnimationFrame(particleAnimationId);
         }
         window.removeEventListener('resize', resizeParticles);
+        if (lifelineNotifTimeout) {
+            clearTimeout(lifelineNotifTimeout);
+            lifelineNotif.classList.remove('active');
+        }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -1988,6 +2127,10 @@
                 }
                 window.removeEventListener('resize', resizeParticles);
             }
+            if (lifelineNotifTimeout) {
+                clearTimeout(lifelineNotifTimeout);
+                lifelineNotif.classList.remove('active');
+            }
         } catch (error) {
             alert('Failed: ' + error.message);
         }
@@ -2072,9 +2215,13 @@
             particleRunning = false;
             cancelAnimationFrame(particleAnimationId);
         }
+        if (lifelineNotifTimeout) {
+            clearTimeout(lifelineNotifTimeout);
+            lifelineNotif.classList.remove('active');
+        }
     });
 
-    console.log('Quiz Lock System – Lifeline as separate button with Admin view');
+    console.log('Quiz Lock System – Advanced Lifeline with Admin notification');
 </script>
 </body>
 </html>
