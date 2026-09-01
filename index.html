@@ -661,7 +661,7 @@
         }
 
         /* ============================================================
-           NEW PROFESSIONAL THEME — VARIABLES & RESET
+           NEW HERO STYLE — "MODERN SPLIT" 
            ============================================================ */
         :root {
             --theme-bg: #0b0f1a;
@@ -691,8 +691,641 @@
             padding-top: 80px;
         }
 
+        /* HERO - MODERN SPLIT */
+        .hero-split {
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 60px;
+            background: linear-gradient(145deg, #0b0f1a 0%, #161e30 100%);
+            isolation: isolate;
+        }
+
+        .hero-split::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(240, 180, 41, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(58, 141, 243, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 180, 41, 0.03) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .hero-split .bg-shapes {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .hero-split .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        .hero-split .bg-shapes .shape.s1 {
+            width: 400px;
+            height: 400px;
+            top: -10%;
+            right: -5%;
+            background: radial-gradient(circle, rgba(240, 180, 41, 0.15), transparent 70%);
+            animation: floatShape 20s infinite alternate ease-in-out;
+        }
+
+        .hero-split .bg-shapes .shape.s2 {
+            width: 300px;
+            height: 300px;
+            bottom: -10%;
+            left: -5%;
+            background: radial-gradient(circle, rgba(58, 141, 243, 0.12), transparent 70%);
+            animation: floatShape 25s infinite alternate-reverse ease-in-out;
+        }
+
+        .hero-split .bg-shapes .shape.s3 {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 50%;
+            background: radial-gradient(circle, rgba(240, 180, 41, 0.08), transparent 70%);
+            animation: floatShape 18s infinite alternate ease-in-out;
+        }
+
+        @keyframes floatShape {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        .hero-split .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-split .hero-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hero-split .hero-badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .hero-split .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--theme-text-muted);
+            backdrop-filter: blur(4px);
+            transition: var(--theme-transition);
+        }
+
+        .hero-split .hero-badge i {
+            color: var(--theme-gold);
+            font-size: 0.8rem;
+        }
+
+        .hero-split .hero-badge .badge-highlight {
+            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
+            color: #0b0f1a;
+            padding: 2px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        .hero-split .hero-title {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 3.6rem;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, var(--theme-gold-light) 60%, var(--theme-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            max-width: 700px;
+        }
+
+        .hero-split .hero-title .accent-text {
+            color: var(--theme-gold);
+            -webkit-text-fill-color: var(--theme-gold);
+        }
+
+        .hero-split .hero-desc {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--theme-text-muted);
+            max-width: 520px;
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--theme-radius);
+            border-left: 4px solid var(--theme-gold);
+            backdrop-filter: blur(6px);
+            font-weight: 400;
+        }
+
+        .hero-split .hero-desc i {
+            color: var(--theme-gold);
+            opacity: 0.7;
+        }
+
+        .hero-split .hero-ctas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .hero-split .btn-split {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--theme-transition);
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-body);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-split .btn-split .btn-shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .hero-split .btn-split:hover .btn-shine {
+            left: 100%;
+        }
+
+        .hero-split .btn-split-primary {
+            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
+            color: #0b0f1a;
+            box-shadow: 0 8px 30px rgba(240, 180, 41, 0.3);
+        }
+
+        .hero-split .btn-split-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 45px rgba(240, 180, 41, 0.4);
+            color: #0b0f1a;
+        }
+
+        .hero-split .btn-split-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-split .btn-split-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        .hero-split .btn-split-accent {
+            background: linear-gradient(135deg, #2a4bbf, #3a8df3);
+            color: white;
+            box-shadow: 0 8px 30px rgba(58, 141, 243, 0.25);
+        }
+
+        .hero-split .btn-split-accent:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 45px rgba(58, 141, 243, 0.35);
+            color: white;
+        }
+
+        .hero-split .stats-split {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding: 16px 28px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--theme-radius);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            max-width: 460px;
+        }
+
+        .hero-split .stats-split .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .hero-split .stats-split .stat-number {
+            display: block;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero-split .stats-split .stat-label {
+            font-size: 0.8rem;
+            color: var(--theme-text-muted);
+            font-weight: 400;
+        }
+
+        .hero-split .stats-split .stat-divider {
+            width: 1px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Countdown Card — Split Style */
+        .countdown-split {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: var(--theme-radius);
+            padding: 32px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: var(--theme-shadow);
+            transition: var(--theme-transition);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .countdown-split:hover {
+            transform: translateY(-6px);
+            border-color: rgba(240, 180, 41, 0.15);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+        }
+
+        .countdown-split .card-glow-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--theme-gold), var(--theme-gold-light), transparent);
+            opacity: 0.5;
+        }
+
+        .countdown-split .cd-header {
+            text-align: center;
+            margin-bottom: 22px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .countdown-split .cd-header .cd-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0b0f1a;
+            font-size: 1.3rem;
+            box-shadow: 0 8px 30px rgba(240, 180, 41, 0.2);
+        }
+
+        .countdown-split .cd-header h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .countdown-split .cd-header p {
+            color: var(--theme-text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .countdown-split .cd-units {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 18px 0 20px;
+        }
+
+        .countdown-split .cd-unit {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 6px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: var(--theme-transition);
+        }
+
+        .countdown-split .cd-unit:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(240, 180, 41, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .countdown-split .cd-unit .value {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            display: block;
+            line-height: 1.1;
+            letter-spacing: 0.02em;
+        }
+
+        .countdown-split .cd-unit .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: var(--theme-text-muted);
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .countdown-split .cd-progress {
+            margin-top: 16px;
+        }
+
+        .countdown-split .cd-progress .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--theme-text-muted);
+            margin-bottom: 6px;
+        }
+
+        .countdown-split .cd-progress .progress-labels span:last-child {
+            color: var(--theme-gold);
+            font-weight: 600;
+        }
+
+        .countdown-split .cd-progress .track {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .countdown-split .cd-progress .track .bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-gold), var(--theme-gold-light));
+            border-radius: 4px;
+            width: 0%;
+            position: relative;
+            transition: width 0.5s ease;
+        }
+
+        .countdown-split .cd-progress .track .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .countdown-split .cd-exam-info {
+            margin-top: 18px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border-left: 4px solid var(--theme-gold);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-split .cd-exam-info .info-icon {
+            color: var(--theme-gold);
+            font-size: 1.2rem;
+        }
+
+        .countdown-split .cd-exam-info .info-text h6 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .countdown-split .cd-exam-info .info-text p {
+            color: var(--theme-text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .countdown-split .cd-exam-info .info-text small {
+            color: var(--theme-text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator-split {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.4;
+            animation: fadeInUp 1.5s ease 1.8s both;
+            z-index: 2;
+        }
+
+        .scroll-indicator-split .mouse {
+            width: 26px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            position: relative;
+        }
+
+        .scroll-indicator-split .mouse .wheel {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            animation: scrollWheel 2s infinite;
+        }
+
+        @keyframes scrollWheel {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(16px);
+            }
+        }
+
+        .scroll-indicator-split .arrows {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .scroll-indicator-split .arrows span {
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-right: 2px solid rgba(255, 255, 255, 0.2);
+            transform: rotate(45deg);
+            margin: -3px;
+            animation: arrowDown 2s infinite;
+        }
+
+        .scroll-indicator-split .arrows span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .scroll-indicator-split .arrows span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes arrowDown {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-split {
+                min-height: auto;
+                padding: 80px 0 40px;
+            }
+            .hero-split .hero-title {
+                font-size: 2.8rem;
+            }
+            .countdown-split {
+                margin-top: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-split .hero-title {
+                font-size: 2.2rem;
+            }
+            .hero-split .hero-badge-group {
+                gap: 8px;
+            }
+            .hero-split .hero-badge {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .hero-split .hero-desc {
+                font-size: 0.95rem;
+                padding: 16px 20px;
+            }
+            .hero-split .stats-split {
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px 20px;
+                max-width: 100%;
+            }
+            .hero-split .stats-split .stat-divider {
+                width: 100%;
+                height: 1px;
+            }
+            .countdown-split .cd-unit .value {
+                font-size: 1.5rem;
+            }
+            .countdown-split {
+                padding: 24px 18px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-split .hero-title {
+                font-size: 1.8rem;
+            }
+            .hero-split .hero-ctas .btn-split {
+                width: 100%;
+                justify-content: center;
+            }
+            .countdown-split .cd-units {
+                gap: 6px;
+            }
+            .countdown-split .cd-unit .value {
+                font-size: 1.2rem;
+            }
+        }
+
         /* ============================================================
-           SECTION COMMON STYLES
+           ALL OTHER SECTIONS (unchanged from original)
+           ============================================================ */
+        /* The rest of the CSS is kept identical to the original professional theme.
+           For brevity, we include the same styles as before. 
+           But since we are providing the full page, we need to include all styles.
+           We'll include them in a separate block. */
+
+        /* ============================================================
+           SECTION COMMON STYLES (copied from previous)
            ============================================================ */
         .section-padding {
             padding: 80px 0;
@@ -763,595 +1396,7 @@
         }
 
         /* ============================================================
-           HERO — PROFESSIONAL DARK
-           ============================================================ */
-        .hero-pro {
-            position: relative;
-            overflow: hidden;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 120px 0 60px;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(240, 180, 41, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 70%, rgba(58, 141, 243, 0.04) 0%, transparent 50%),
-                linear-gradient(160deg, #070b14 0%, #0f1628 50%, #0b111e 100%),
-                url('https://i.ibb.co/Q7jZT3tS/nsmbuild.jpg');
-            background-size: cover, cover, cover, cover;
-            background-position: center;
-            background-blend-mode: overlay, overlay, normal, normal;
-            background-attachment: fixed;
-        }
-
-        @media (max-width: 992px) {
-            .hero-pro {
-                background-attachment: scroll;
-                min-height: auto;
-                padding: 80px 0 40px;
-            }
-        }
-
-        .hero-pro .bg-glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            pointer-events: none;
-        }
-
-        .hero-pro .bg-glow.g1 {
-            width: 500px;
-            height: 500px;
-            top: -15%;
-            right: -10%;
-            background: radial-gradient(circle, rgba(240, 180, 41, 0.08), transparent 70%);
-        }
-
-        .hero-pro .bg-glow.g2 {
-            width: 400px;
-            height: 400px;
-            bottom: -10%;
-            left: -5%;
-            background: radial-gradient(circle, rgba(58, 141, 243, 0.06), transparent 70%);
-        }
-
-        .hero-pro .hero-title {
-            font-family: var(--font-heading);
-            font-weight: 900;
-            font-size: 3.4rem;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #ffffff 0%, var(--theme-gold-light) 60%, var(--theme-gold) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-            position: relative;
-        }
-
-        .hero-pro .hero-title .glow-text {
-            text-shadow: 0 0 60px rgba(240, 180, 41, 0.15);
-        }
-
-        .hero-pro .hero-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .hero-pro .hero-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-            color: var(--theme-text-muted);
-            backdrop-filter: blur(8px);
-        }
-
-        .hero-pro .hero-meta-item i {
-            color: var(--theme-gold);
-            font-size: 0.9rem;
-        }
-
-        .hero-pro .hero-meta-item .badge-pro {
-            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
-            color: #0b0f1a;
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.75rem;
-        }
-
-        .hero-pro .hero-desc {
-            font-size: 1.05rem;
-            line-height: 1.9;
-            color: var(--theme-text-muted);
-            max-width: 520px;
-            margin-bottom: 32px;
-            padding: 20px 28px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: var(--theme-radius);
-            border-left: 4px solid var(--theme-gold);
-            backdrop-filter: blur(6px);
-            font-weight: 400;
-        }
-
-        .hero-pro .hero-desc i {
-            color: var(--theme-gold);
-            opacity: 0.7;
-        }
-
-        .hero-pro .hero-ctas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-bottom: 32px;
-        }
-
-        .hero-pro .btn-pro {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            transition: var(--theme-transition);
-            border: none;
-            cursor: pointer;
-            font-family: var(--font-body);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-pro .btn-pro .btn-shine {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .hero-pro .btn-pro:hover .btn-shine {
-            left: 100%;
-        }
-
-        .hero-pro .btn-pro-primary {
-            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
-            color: #0b0f1a;
-            box-shadow: 0 8px 30px rgba(240, 180, 41, 0.3);
-        }
-
-        .hero-pro .btn-pro-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 45px rgba(240, 180, 41, 0.4);
-            color: #0b0f1a;
-        }
-
-        .hero-pro .btn-pro-secondary {
-            background: rgba(255, 255, 255, 0.06);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .hero-pro .btn-pro-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-3px);
-            color: white;
-        }
-
-        .hero-pro .btn-pro-accent {
-            background: linear-gradient(135deg, #2a4bbf, #3a8df3);
-            color: white;
-            box-shadow: 0 8px 30px rgba(58, 141, 243, 0.25);
-        }
-
-        .hero-pro .btn-pro-accent:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 45px rgba(58, 141, 243, 0.35);
-            color: white;
-        }
-
-        .hero-pro .stats-pro {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            padding: 16px 28px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: var(--theme-radius);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            max-width: 460px;
-        }
-
-        .hero-pro .stats-pro .stat-item {
-            text-align: center;
-            flex: 1;
-        }
-
-        .hero-pro .stats-pro .stat-number {
-            display: block;
-            font-family: var(--font-heading);
-            font-weight: 800;
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
-        }
-
-        .hero-pro .stats-pro .stat-label {
-            font-size: 0.8rem;
-            color: var(--theme-text-muted);
-            font-weight: 400;
-        }
-
-        .hero-pro .stats-pro .stat-divider {
-            width: 1px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        /* Countdown Card — Pro */
-        .countdown-card-pro {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-radius: var(--theme-radius);
-            padding: 32px 28px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: var(--theme-shadow);
-            transition: var(--theme-transition);
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .countdown-card-pro:hover {
-            transform: translateY(-6px);
-            border-color: rgba(240, 180, 41, 0.15);
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
-        }
-
-        .countdown-card-pro .card-glow-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--theme-gold), var(--theme-gold-light), transparent);
-            opacity: 0.6;
-        }
-
-        .countdown-card-pro .cd-header {
-            text-align: center;
-            margin-bottom: 22px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .countdown-card-pro .cd-header .cd-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 10px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--theme-gold), #d4a020);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0b0f1a;
-            font-size: 1.3rem;
-            box-shadow: 0 8px 30px rgba(240, 180, 41, 0.2);
-        }
-
-        .countdown-card-pro .cd-header h3 {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: white;
-            margin-bottom: 2px;
-        }
-
-        .countdown-card-pro .cd-header p {
-            color: var(--theme-text-muted);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-
-        .countdown-card-pro .cd-units {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 18px 0 20px;
-        }
-
-        .countdown-card-pro .cd-unit {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
-            padding: 14px 6px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: var(--theme-transition);
-        }
-
-        .countdown-card-pro .cd-unit:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(240, 180, 41, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .countdown-card-pro .cd-unit .value {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            font-weight: 800;
-            color: white;
-            display: block;
-            line-height: 1.1;
-            letter-spacing: 0.02em;
-        }
-
-        .countdown-card-pro .cd-unit .label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            color: var(--theme-text-muted);
-            letter-spacing: 0.08em;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
-        .countdown-card-pro .cd-progress {
-            margin-top: 16px;
-        }
-
-        .countdown-card-pro .cd-progress .progress-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--theme-text-muted);
-            margin-bottom: 6px;
-        }
-
-        .countdown-card-pro .cd-progress .progress-labels span:last-child {
-            color: var(--theme-gold);
-            font-weight: 600;
-        }
-
-        .countdown-card-pro .cd-progress .track {
-            height: 5px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .countdown-card-pro .cd-progress .track .bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--theme-gold), var(--theme-gold-light));
-            border-radius: 4px;
-            width: 0%;
-            position: relative;
-            transition: width 0.5s ease;
-        }
-
-        .countdown-card-pro .cd-progress .track .bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .countdown-card-pro .cd-exam-info {
-            margin-top: 18px;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border-left: 4px solid var(--theme-gold);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .countdown-card-pro .cd-exam-info .info-icon {
-            color: var(--theme-gold);
-            font-size: 1.2rem;
-        }
-
-        .countdown-card-pro .cd-exam-info .info-text h6 {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: white;
-            margin-bottom: 2px;
-        }
-
-        .countdown-card-pro .cd-exam-info .info-text p {
-            color: var(--theme-text-muted);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-
-        .countdown-card-pro .cd-exam-info .info-text small {
-            color: var(--theme-text-muted);
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        @media (max-width: 992px) {
-            .hero-pro .hero-title {
-                font-size: 2.8rem;
-            }
-            .countdown-card-pro {
-                margin-top: 40px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero-pro .hero-title {
-                font-size: 2.2rem;
-            }
-            .hero-pro .hero-meta {
-                gap: 10px;
-            }
-            .hero-pro .hero-meta-item {
-                font-size: 0.8rem;
-                padding: 6px 14px;
-            }
-            .hero-pro .hero-desc {
-                font-size: 0.95rem;
-                padding: 16px 20px;
-            }
-            .hero-pro .stats-pro {
-                flex-direction: column;
-                gap: 16px;
-                padding: 16px 20px;
-                max-width: 100%;
-            }
-            .hero-pro .stats-pro .stat-divider {
-                width: 100%;
-                height: 1px;
-            }
-            .countdown-card-pro .cd-unit .value {
-                font-size: 1.5rem;
-            }
-            .countdown-card-pro {
-                padding: 24px 18px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .hero-pro .hero-title {
-                font-size: 1.8rem;
-            }
-            .hero-pro .hero-ctas .btn-pro {
-                width: 100%;
-                justify-content: center;
-            }
-            .countdown-card-pro .cd-units {
-                gap: 6px;
-            }
-            .countdown-card-pro .cd-unit .value {
-                font-size: 1.2rem;
-            }
-        }
-
-        /* ============================================================
-           SCROLL INDICATOR
-           ============================================================ */
-        .scroll-indicator-pro {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0.4;
-            animation: fadeInUp 1.5s ease 1.8s both;
-        }
-
-        .scroll-indicator-pro .mouse {
-            width: 26px;
-            height: 40px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            position: relative;
-        }
-
-        .scroll-indicator-pro .mouse .wheel {
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            animation: scrollWheel 2s infinite;
-        }
-
-        @keyframes scrollWheel {
-            0% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(16px);
-            }
-        }
-
-        .scroll-indicator-pro .arrows {
-            margin-top: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .scroll-indicator-pro .arrows span {
-            display: block;
-            width: 8px;
-            height: 8px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            border-right: 2px solid rgba(255, 255, 255, 0.2);
-            transform: rotate(45deg);
-            margin: -3px;
-            animation: arrowDown 2s infinite;
-        }
-
-        .scroll-indicator-pro .arrows span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .scroll-indicator-pro .arrows span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes arrowDown {
-            0% {
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ============================================================
-           NEWS TICKER — PRO
+           NEWS TICKER — PRO (unchanged)
            ============================================================ */
         .ticker-pro {
             width: 100%;
@@ -1452,7 +1497,7 @@
         }
 
         /* ============================================================
-           TOPPERS — PRO
+           TOPPERS — PRO (unchanged)
            ============================================================ */
         #class-toppers-pro {
             padding: 60px 0;
@@ -1643,7 +1688,7 @@
         }
 
         /* ============================================================
-           ABOUT — PRO
+           ABOUT — PRO (unchanged)
            ============================================================ */
         #about-pro {
             background: var(--theme-bg);
@@ -1736,7 +1781,7 @@
         }
 
         /* ============================================================
-           MESSAGE & USTADS — PRO
+           MESSAGE & USTADS — PRO (unchanged)
            ============================================================ */
         #message-pro {
             background: var(--theme-surface);
@@ -1825,7 +1870,6 @@
             font-size: 1.2rem;
         }
 
-        /* Ustad Cards Pro */
         .ustad-wrapper-pro {
             display: flex;
             flex-wrap: wrap;
@@ -2012,7 +2056,7 @@
         }
 
         /* ============================================================
-           HIGHLIGHTS — PRO
+           HIGHLIGHTS — PRO (unchanged)
            ============================================================ */
         #highlights-pro {
             background: var(--theme-bg);
@@ -2078,7 +2122,7 @@
         }
 
         /* ============================================================
-           NEWS — PRO
+           NEWS — PRO (unchanged)
            ============================================================ */
         #news-pro {
             background: var(--theme-surface);
@@ -2170,7 +2214,7 @@
         }
 
         /* ============================================================
-           NOTIFICATIONS — PRO
+           NOTIFICATIONS — PRO (unchanged)
            ============================================================ */
         #notifications-pro {
             background: var(--theme-bg);
@@ -2265,7 +2309,7 @@
         }
 
         /* ============================================================
-           FOOTER — PRO
+           FOOTER — PRO (unchanged)
            ============================================================ */
         .footer-pro {
             background: var(--theme-surface);
@@ -2456,7 +2500,7 @@
         }
 
         /* ============================================================
-           WHATSAPP FLOAT
+           WHATSAPP FLOAT (unchanged)
            ============================================================ */
         .whatsapp-float-pro {
             position: fixed;
@@ -2498,7 +2542,6 @@
             }
         }
 
-        /* AOS overrides */
         [data-aos] {
             pointer-events: none;
         }
@@ -2718,80 +2761,88 @@
     </nav>
 
     <!-- ============================================================
-    HERO — PROFESSIONAL
+    HERO — MODERN SPLIT (NEW STYLE)
     ============================================================ -->
-    <section id="hero-pro" class="hero-pro" aria-label="Noorussalam Madrasa hero">
-        <div class="bg-glow g1"></div>
-        <div class="bg-glow g2"></div>
+    <section id="hero-split" class="hero-split" aria-label="Noorussalam Madrasa hero">
+        <!-- Background shapes -->
+        <div class="bg-shapes">
+            <div class="shape s1"></div>
+            <div class="shape s2"></div>
+            <div class="shape s3"></div>
+        </div>
 
         <div class="container">
-            <div class="row justify-content-center align-items-center min-vh-80">
-                <div class="col-lg-6 col-md-8 text-center text-md-start mb-5 mb-lg-0" data-aos="fade-right" data-aos-duration="800">
+            <div class="row align-items-center">
+                <!-- Left Column: Text & CTAs -->
+                <div class="col-lg-6 col-md-8" data-aos="fade-right" data-aos-duration="800">
+                    <div class="hero-content">
 
-                    <div class="hero-meta">
-                        <span class="hero-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Kambippalam, Kerala Estate
-                        </span>
-                        <span class="hero-meta-item">
-                            <i class="fas fa-certificate"></i>
-                            <span class="badge-pro">SKIMVB Reg No: 6110</span>
-                        </span>
-                    </div>
-
-                    <h1 class="hero-title">
-                        NOORUSSALAM<br>
-                        <span class="glow-text">MADRASA</span>
-                    </h1>
-
-                    <p class="hero-desc">
-                        <i class="fas fa-quote-left me-2"></i>
-                        Committed to providing Islamic education in accordance with the guidelines
-                        and values of the SKIMVB.
-                        <i class="fas fa-quote-right ms-2"></i>
-                    </p>
-
-                    <div class="hero-ctas">
-                        <a href="fees.html" class="btn-pro btn-pro-primary">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            <span>Varisamgya Peyment</span>
-                            <span class="btn-shine"></span>
-                        </a>
-
-                        <a href="calendar.html" class="btn-pro btn-pro-secondary">
-                            <i class="fa-solid fa-calendar"></i>
-                            <span>Academic Calendar</span>
-                            <span class="btn-shine"></span>
-                        </a>
-
-                        <a href="https://online.samastha.info/admission_form.php?i=6110" class="btn-pro btn-pro-accent">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Admissions</span>
-                            <span class="btn-shine"></span>
-                        </a>
-                    </div>
-
-                    <div class="stats-pro">
-                        <div class="stat-item">
-                            <span class="stat-number">35+</span>
-                            <span class="stat-label">Years of Excellence</span>
+                        <div class="hero-badge-group">
+                            <span class="hero-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Kambippalam, Kerala Estate
+                            </span>
+                            <span class="hero-badge">
+                                <i class="fas fa-certificate"></i>
+                                <span class="badge-highlight">SKIMVB Reg No: 6110</span>
+                            </span>
                         </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <span class="stat-number">100%</span>
-                            <span class="stat-label">Success Rate</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <span class="stat-number">800+</span>
-                            <span class="stat-label">Alumni</span>
-                        </div>
-                    </div>
 
+                        <h1 class="hero-title">
+                            NOORUSSALAM<br>
+                            <span class="accent-text">MADRASA</span>
+                        </h1>
+
+                        <p class="hero-desc">
+                            <i class="fas fa-quote-left me-2"></i>
+                            Committed to providing Islamic education in accordance with the guidelines
+                            and values of the SKIMVB.
+                            <i class="fas fa-quote-right ms-2"></i>
+                        </p>
+
+                        <div class="hero-ctas">
+                            <a href="fees.html" class="btn-split btn-split-primary">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Varisamgya Peyment</span>
+                                <span class="btn-shine"></span>
+                            </a>
+
+                            <a href="calendar.html" class="btn-split btn-split-secondary">
+                                <i class="fa-solid fa-calendar"></i>
+                                <span>Academic Calendar</span>
+                                <span class="btn-shine"></span>
+                            </a>
+
+                            <a href="https://online.samastha.info/admission_form.php?i=6110" class="btn-split btn-split-accent">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Admissions</span>
+                                <span class="btn-shine"></span>
+                            </a>
+                        </div>
+
+                        <div class="stats-split">
+                            <div class="stat-item">
+                                <span class="stat-number">35+</span>
+                                <span class="stat-label">Years of Excellence</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-number">100%</span>
+                                <span class="stat-label">Success Rate</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-number">800+</span>
+                                <span class="stat-label">Alumni</span>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="col-lg-5 offset-lg-1 col-md-8" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200" id="countdown-section-pro">
-                    <div class="countdown-card-pro">
+                <!-- Right Column: Countdown Card -->
+                <div class="col-lg-5 offset-lg-1 col-md-8" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200" id="countdown-section-split">
+                    <div class="countdown-split">
                         <div class="card-glow-line"></div>
 
                         <div class="cd-header">
@@ -2804,19 +2855,19 @@
 
                         <div class="cd-units">
                             <div class="cd-unit">
-                                <span class="value" id="days-pro">00</span>
+                                <span class="value" id="days-split">00</span>
                                 <span class="label">Day</span>
                             </div>
                             <div class="cd-unit">
-                                <span class="value" id="hours-pro">00</span>
+                                <span class="value" id="hours-split">00</span>
                                 <span class="label">Hour</span>
                             </div>
                             <div class="cd-unit">
-                                <span class="value" id="minutes-pro">00</span>
+                                <span class="value" id="minutes-split">00</span>
                                 <span class="label">Minute</span>
                             </div>
                             <div class="cd-unit">
-                                <span class="value" id="seconds-pro">00</span>
+                                <span class="value" id="seconds-split">00</span>
                                 <span class="label">Second</span>
                             </div>
                         </div>
@@ -2824,10 +2875,10 @@
                         <div class="cd-progress">
                             <div class="progress-labels">
                                 <span>Time Remaining</span>
-                                <span id="progress-pct-pro">75%</span>
+                                <span id="progress-pct-split">75%</span>
                             </div>
                             <div class="track">
-                                <div class="bar" id="progress-bar-pro"></div>
+                                <div class="bar" id="progress-bar-split"></div>
                             </div>
                         </div>
 
@@ -2845,7 +2896,8 @@
                 </div>
             </div>
 
-            <div class="scroll-indicator-pro">
+            <!-- Scroll indicator -->
+            <div class="scroll-indicator-split">
                 <div class="mouse">
                     <div class="wheel"></div>
                 </div>
@@ -2859,7 +2911,7 @@
     </section>
 
     <!-- ============================================================
-    NEWS TICKER — PRO
+    NEWS TICKER — PRO (unchanged)
     ============================================================ -->
     <div class="container">
         <div class="ticker-pro" role="region" aria-label="Latest news ticker">
@@ -2907,7 +2959,7 @@
     </div>
 
     <!-- ============================================================
-    CLASS TOPPERS — PRO
+    CLASS TOPPERS — PRO (unchanged)
     ============================================================ -->
     <section id="class-toppers-pro">
         <div class="container">
@@ -2950,7 +3002,7 @@
     </section>
 
     <!-- ============================================================
-    ABOUT — PRO
+    ABOUT — PRO (unchanged)
     ============================================================ -->
     <section id="about-pro">
         <div class="container">
@@ -2989,7 +3041,7 @@
     </section>
 
     <!-- ============================================================
-    MESSAGE & USTADS — PRO
+    MESSAGE & USTADS — PRO (unchanged)
     ============================================================ -->
     <section id="message-pro">
         <div class="container">
@@ -3077,7 +3129,7 @@
     </section>
 
     <!-- ============================================================
-    HIGHLIGHTS — PRO
+    HIGHLIGHTS — PRO (unchanged)
     ============================================================ -->
     <section id="highlights-pro">
         <div class="container">
@@ -3126,7 +3178,7 @@
             </div>
 
             <div class="text-center mt-4" data-aos="fade-up">
-                <a href="youtube.html" class="btn-pro btn-pro-primary">
+                <a href="youtube.html" class="btn-split btn-split-primary">
                     <i class="fab fa-youtube"></i>
                     <span>View More on YouTube</span>
                     <span class="btn-shine"></span>
@@ -3136,7 +3188,7 @@
     </section>
 
     <!-- ============================================================
-    NEWS — PRO
+    NEWS — PRO (unchanged)
     ============================================================ -->
     <section id="news-pro">
         <div class="container">
@@ -3217,7 +3269,7 @@
     </section>
 
     <!-- ============================================================
-    NOTIFICATIONS — PRO
+    NOTIFICATIONS — PRO (unchanged)
     ============================================================ -->
     <section id="notifications-pro" data-aos="fade-up">
         <div class="container">
@@ -3266,7 +3318,7 @@
     </section>
 
     <!-- ============================================================
-    FOOTER — PRO
+    FOOTER — PRO (unchanged)
     ============================================================ -->
     <footer class="footer-pro">
         <div class="container">
@@ -3411,19 +3463,19 @@
         });
 
         // ===========================================
-        // COUNTDOWN TIMER — PRO
+        // COUNTDOWN TIMER — SPLIT
         // ===========================================
 
-        function initCountdownPro() {
+        function initCountdownSplit() {
             const examStart = new Date('2026-10-24T06:00:00');
             const examEnd = new Date('2026-11-01T09:00:00');
 
-            const daysEl = document.getElementById('days-pro');
-            const hoursEl = document.getElementById('hours-pro');
-            const minutesEl = document.getElementById('minutes-pro');
-            const secondsEl = document.getElementById('seconds-pro');
-            const progressBar = document.getElementById('progress-bar-pro');
-            const progressPct = document.getElementById('progress-pct-pro');
+            const daysEl = document.getElementById('days-split');
+            const hoursEl = document.getElementById('hours-split');
+            const minutesEl = document.getElementById('minutes-split');
+            const secondsEl = document.getElementById('seconds-split');
+            const progressBar = document.getElementById('progress-bar-split');
+            const progressPct = document.getElementById('progress-pct-split');
 
             if (!daysEl) return;
 
@@ -3487,7 +3539,7 @@
         // ===========================================
 
         document.addEventListener('DOMContentLoaded', function() {
-            initCountdownPro();
+            initCountdownSplit();
         });
     </script>
 
