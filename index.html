@@ -2136,7 +2136,7 @@
             </div>
         </div>
 
-        <!-- ===== REGISTER MODAL (updated fields) ===== -->
+        <!-- ===== REGISTER MODAL ===== -->
         <div id="registerModal" class="modal-overlay hidden">
             <div class="modal-glass">
                 <div class="flex-between" style="margin-bottom:16px;">
@@ -2144,7 +2144,7 @@
                     <button class="btn btn-outline btn-sm" id="closeRegisterModalBtn"><i class="fas fa-times"></i></button>
                 </div>
                 <p class="text-muted">Fill in your details to get your Student ID.</p>
-                <p class="text-muted" style="font-size:0.75rem;color:rgba(0,0,0,0.3);">* All fields are required.</p>
+                <p class="text-muted" style="font-size:0.75rem;color:rgba(0,0,0,0.3);">* All fields are required. Email and phone can only be used once.</p>
                 <form id="registerForm" style="margin-top:16px;">
                     <div style="margin-bottom:12px;">
                         <label class="text-muted" style="font-size:0.8rem;">Student Name *</label>
@@ -2171,7 +2171,7 @@
             </div>
         </div>
 
-        <!-- ===== FIND ID MODAL (email + name) ===== -->
+        <!-- ===== FIND ID MODAL ===== -->
         <div id="findIdModal" class="modal-overlay hidden">
             <div class="modal-glass">
                 <div class="flex-between" style="margin-bottom:16px;">
@@ -2193,7 +2193,7 @@
             </div>
         </div>
 
-        <!-- ===== STUDENT DASHBOARD (no overall rank card) ===== -->
+        <!-- ===== STUDENT DASHBOARD ===== -->
         <div id="parentDashboard" class="hidden">
             <!-- STICKY HEADER -->
             <div class="dashboard-header" id="parentHeader">
@@ -2209,7 +2209,7 @@
                 </div>
             </div>
 
-            <!-- STATS GRID — only Day and Questions, no Overall Rank -->
+            <!-- STATS GRID -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div><span class="stat-value" id="quizDayDisplay">Day 1</span>
@@ -2462,7 +2462,7 @@
             </div>
         </div>
 
-        <!-- ===== OVERALL RANK MODAL (admin) ===== -->
+        <!-- ===== OVERALL RANK MODAL ===== -->
         <div id="overallRankModal" class="modal-overlay hidden overall-rank-modal">
             <div class="modal-glass">
                 <div class="flex-between" style="margin-bottom:16px;">
@@ -2715,7 +2715,7 @@
         document.getElementById('adminLogoutBtn').addEventListener('click', logout);
 
         // ================================================================
-        // REGISTRATION (updated fields)
+        // REGISTRATION with duplicate check (email & phone)
         // ================================================================
         document.getElementById('showRegisterBtn').addEventListener('click', function() {
             document.getElementById('registerModal').classList.remove('hidden');
@@ -2763,6 +2763,41 @@
                 '<span style="display:inline-block;width:1.2rem;height:1.2rem;border:2px solid rgba(255,255,255,0.1);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></span>';
 
             try {
+                // Check if email already exists
+                const { data: existingEmail, error: emailErr } = await _supabase
+                    .from('Student')
+                    .select('studentId')
+                    .eq('parentName', email)
+                    .eq('role', 'student')
+                    .maybeSingle();
+
+                if (emailErr) throw emailErr;
+                if (existingEmail) {
+                    msg.innerHTML = '<div style="color:#ef4444;">❌ This email is already registered. Please use a different email.</div>';
+                    showToast('Email already registered', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Register';
+                    return;
+                }
+
+                // Check if phone already exists
+                const { data: existingPhone, error: phoneErr } = await _supabase
+                    .from('Student')
+                    .select('studentId')
+                    .eq('className', phone)
+                    .eq('role', 'student')
+                    .maybeSingle();
+
+                if (phoneErr) throw phoneErr;
+                if (existingPhone) {
+                    msg.innerHTML = '<div style="color:#ef4444;">❌ This phone number is already registered. Please use a different number.</div>';
+                    showToast('Phone already registered', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Register';
+                    return;
+                }
+
+                // All clear — proceed with registration
                 const prefix = 'STU';
                 const random = Math.floor(100000 + Math.random() * 900000);
                 const studentId = prefix + random;
@@ -2804,7 +2839,7 @@
         });
 
         // ================================================================
-        // FIND ID (email + name)
+        // FIND ID
         // ================================================================
         function openFindId() {
             document.getElementById('findIdModal').classList.remove('hidden');
@@ -2858,7 +2893,7 @@
         });
 
         // ================================================================
-        // STUDENT DASHBOARD (no overall rank)
+        // STUDENT DASHBOARD
         // ================================================================
         window.questions = [];
         window.answers = {};
@@ -4326,15 +4361,16 @@
             alert(
                 '📘 Student Guide\n\n' +
                 '1. Register with your name, email, and phone to get your Student ID.\n' +
-                '2. Login with your Student ID.\n' +
-                '3. If you forgot your ID, use the "Forgot Student ID?" link with your name and email.\n' +
-                '4. During quiz time, click "View Questions" to start.\n' +
-                '5. Select the correct answer for each question.\n' +
-                '6. Submit all answers before the time runs out.\n' +
-                '7. After submission, wait for the result announcement.\n' +
-                '8. Check "Your History" to see past scores.\n' +
-                '9. You can only participate once per day.\n' +
-                '10. When viewing results, click "View Your Answers" to see correct/incorrect for each question.'
+                '2. Each email and phone number can be used only once.\n' +
+                '3. Login with your Student ID.\n' +
+                '4. If you forgot your ID, use the "Forgot Student ID?" link with your name and email.\n' +
+                '5. During quiz time, click "View Questions" to start.\n' +
+                '6. Select the correct answer for each question.\n' +
+                '7. Submit all answers before the time runs out.\n' +
+                '8. After submission, wait for the result announcement.\n' +
+                '9. Check "Your History" to see past scores.\n' +
+                '10. You can only participate once per day.\n' +
+                '11. When viewing results, click "View Your Answers" to see correct/incorrect for each question.'
             );
         }
 
