@@ -318,7 +318,7 @@
             border-radius: 3.2rem;
             padding: 2.6rem 2.2rem 2.0rem;
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
+            box-shadow:
                 0 30px 80px rgba(34, 197, 94, 0.10),
                 0 10px 30px rgba(0, 0, 0, 0.04),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -368,7 +368,7 @@
 
         .login-panel:hover {
             transform: translateY(-3px);
-            box-shadow: 
+            box-shadow:
                 0 40px 90px rgba(34, 197, 94, 0.15),
                 0 15px 40px rgba(0, 0, 0, 0.05),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -1803,6 +1803,266 @@
         }
 
         /* ================================================================
+           ANIMATED LOGOUT BUTTON – merged into dashboard header
+           ================================================================ */
+        .logout-btn-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logoutButton {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            border-radius: 16px;
+            background: #20263c;
+            transition: .3s;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .20), 0 2px 8px rgba(0, 0, 0, .10);
+            flex-shrink: 0;
+            overflow: visible;
+            --arm1: rotate(0deg);
+            --wrist1: rotate(0deg);
+            --arm2: rotate(0deg);
+            --wrist2: rotate(0deg);
+            --leg1: rotate(0deg);
+            --calf1: rotate(0deg);
+            --leg2: rotate(0deg);
+            --calf2: rotate(0deg);
+        }
+
+        .logoutButton:hover {
+            background: #2a3150;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .30), 0 4px 14px rgba(0, 0, 0, .18);
+            transform: translateY(-2px);
+        }
+
+        .logoutButton:active {
+            transform: scale(.94);
+        }
+
+        .logoutButton .button-text {
+            display: none;
+        }
+
+        .logoutButton svg {
+            position: absolute;
+            display: block;
+            overflow: visible;
+        }
+
+        .logoutButton .doorway {
+            width: 32px;
+            right: 10px;
+            bottom: 6px;
+            fill: #d7dce6;
+            z-index: 3;
+        }
+
+        .logoutButton .door {
+            width: 40px;
+            right: 10px;
+            bottom: 2px;
+            fill: #4d7cff;
+            transition: .45s ease;
+            transform: rotateY(20deg);
+            transform-origin: 100% 50%;
+            transform-style: preserve-3d;
+            z-index: 5;
+        }
+
+        .logoutButton .door path {
+            fill: #4d7cff;
+            stroke: #4371f7;
+            stroke-width: 3;
+        }
+
+        .logoutButton .door circle {
+            fill: #ffffff;
+        }
+
+        .logoutButton .figure {
+            position: absolute;
+            width: 30px;
+            right: 18px;
+            bottom: 6px;
+            fill: #4e7bf8;
+            transform-origin: center;
+            transition: transform .8s linear, opacity .7s;
+            z-index: 9;
+        }
+
+        .logoutButton:hover .door {
+            transform: perspective(300px) rotateY(45deg);
+        }
+
+        .logoutButton.walk .figure {
+            transform: translateX(16px);
+        }
+
+        .logoutButton.walk .door {
+            transform: perspective(300px) rotateY(75deg);
+        }
+
+        .logoutButton.fall {
+            animation: shake .25s;
+        }
+
+        .logoutButton.fall .figure {
+            animation: spin 1s linear infinite;
+            bottom: -880px;
+            right: -2px;
+            opacity: 1;
+            transition: bottom 1s ease-in, opacity .5s;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg) scale(.94);
+            }
+            to {
+                transform: rotate(360deg) scale(.94);
+            }
+        }
+
+        .logoutButton .bang {
+            opacity: 0;
+            fill: #ffcf33;
+        }
+
+        .logoutButton.fall .bang {
+            animation: flash .85s;
+            animation-delay: .2s;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+            20% {
+                transform: rotate(-2deg);
+            }
+            40% {
+                transform: rotate(2deg);
+            }
+            60% {
+                transform: rotate(-2deg);
+            }
+            80% {
+                transform: rotate(2deg);
+            }
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .logoutButton .arm1 {
+            transform: var(--arm1);
+            transform-origin: 52% 45%;
+            transition: .12s linear;
+        }
+        .logoutButton .wrist1 {
+            transform: var(--wrist1);
+            transform-origin: 59% 55%;
+            transition: .12s linear;
+        }
+        .logoutButton .arm2 {
+            transform: var(--arm2);
+            transform-origin: 47% 43%;
+            transition: .12s linear;
+        }
+        .logoutButton .wrist2 {
+            transform: var(--wrist2);
+            transform-origin: 35% 47%;
+            transition: .12s linear;
+        }
+        .logoutButton .leg1 {
+            transform: var(--leg1);
+            transform-origin: 47% 64.5%;
+            transition: .12s linear;
+        }
+        .logoutButton .calf1 {
+            transform: var(--calf1);
+            transform-origin: 55.5% 71.5%;
+            transition: .12s linear;
+        }
+        .logoutButton .leg2 {
+            transform: var(--leg2);
+            transform-origin: 43% 63%;
+            transition: .12s linear;
+        }
+        .logoutButton .calf2 {
+            transform: var(--calf2);
+            transform-origin: 41.5% 73%;
+            transition: .12s linear;
+        }
+
+        /* small screen tweaks */
+        @media (max-width: 550px) {
+            .logoutButton {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+            }
+            .logoutButton .doorway {
+                width: 26px;
+                right: 8px;
+                bottom: 4px;
+            }
+            .logoutButton .door {
+                width: 32px;
+                right: 8px;
+                bottom: 1px;
+            }
+            .logoutButton .figure {
+                width: 24px;
+                right: 14px;
+                bottom: 4px;
+            }
+            .logoutButton.fall .figure {
+                bottom: -680px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logoutButton {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+            .logoutButton .doorway {
+                width: 22px;
+                right: 6px;
+                bottom: 3px;
+            }
+            .logoutButton .door {
+                width: 28px;
+                right: 6px;
+                bottom: 1px;
+            }
+            .logoutButton .figure {
+                width: 20px;
+                right: 11px;
+                bottom: 3px;
+            }
+            .logoutButton.fall .figure {
+                bottom: -560px;
+            }
+        }
+
+        /* ================================================================
            RESPONSIVE
            ================================================================ */
         @media (max-width: 768px) {
@@ -1884,8 +2144,8 @@
             .dashboard-header {
                 padding: 12px 16px;
                 border-radius: 1.2rem;
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                flex-wrap: wrap;
                 gap: 10px;
                 position: -webkit-sticky;
                 position: sticky;
@@ -2056,10 +2316,11 @@
                 padding: 12px;
             }
             .dashboard-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-                padding: 12px 14px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 12px;
                 border-radius: 1.2rem;
                 position: -webkit-sticky;
                 position: sticky;
@@ -2204,17 +2465,17 @@
                 padding: 4px 6px;
             }
             .dashboard-header {
-                padding: 8px 10px;
+                padding: 6px 8px;
                 border-radius: 1rem;
                 position: -webkit-sticky;
                 position: sticky;
                 top: 0;
             }
             .avatar-neon {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-                border-radius: 14px;
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+                border-radius: 12px;
             }
             body.login-mode .login-panel {
                 padding: 1rem 0.5rem 0.6rem;
@@ -2404,7 +2665,7 @@
 
         <!-- ===== STUDENT DASHBOARD ===== -->
         <div id="parentDashboard" class="hidden">
-            <!-- STICKY HEADER -->
+            <!-- STICKY HEADER with animated logout button -->
             <div class="dashboard-header" id="parentHeader">
                 <div class="flex" style="gap:14px;">
                     <div class="avatar-neon"><span id="avatarText">S</span></div>
@@ -2413,8 +2674,40 @@
                         <div class="text-muted" style="font-size:0.85rem;"><i class="fas fa-id-card"></i> <span id="displayParentId">ID</span> • <i class="fas fa-envelope"></i> <span id="emailDisplay">Email</span> • <i class="fas fa-phone"></i> <span id="phoneDisplay">Phone</span></div>
                     </div>
                 </div>
-                <div class="flex" style="gap:8px;">
-                    <button class="btn btn-danger btn-sm" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <div class="flex" style="gap:8px; align-items:center;">
+                    <!-- ANIMATED LOGOUT BUTTON -->
+                    <div class="logout-btn-wrap">
+                        <button class="logoutButton" id="animatedLogoutBtn" title="Log out">
+                            <svg class="doorway" viewBox="0 0 100 100">
+                                <path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z" />
+                                <path class="bang" d="M40.5 43.7L26.6 31.4l-2.5 6.7zM41.9 50.4l-19.5-4-1.4 6.3zM40 57.4l-17.7 3.9 3.9 5.7z" />
+                            </svg>
+                            <svg class="figure" viewBox="0 0 100 100">
+                                <circle cx="52.1" cy="32.4" r="6.4" />
+                                <path d="M50.7 62.8c-1.2 2.5-3.6 5-7.2 4-3.2-.9-4.9-3.5-4-7.8.7-3.4 3.1-13.8 4.1-15.8 1.7-3.4 1.6-4.6 7-3.7 4.3.7 4.6 2.5 4.3 5.4-.4 3.7-2.8 15.1-4.2 17.9z" />
+                                <g class="arm1">
+                                    <path d="M55.5 56.5l-6-9.5c-1-1.5-.6-3.5.9-4.4 1.5-1 3.7-1.1 4.6.4l6.1 10c1 1.5.3 3.5-1.1 4.4-1.5.9-3.5.5-4.5-.9z" />
+                                    <path class="wrist1" d="M69.4 59.9L58.1 58c-1.7-.3-2.9-1.9-2.6-3.7.3-1.7 1.9-2.9 3.7-2.6l11.4 1.9c1.7.3 2.9 1.9 2.6 3.7-.4 1.7-2 2.9-3.8 2.6z" />
+                                </g>
+                                <g class="arm2">
+                                    <path d="M34.2 43.6L45 40.3c1.7-.6 3.5.3 4 2 .6 1.7-.3 4-2 4.5l-10.8 2.8c-1.7.6-3.5-.3-4-2-.6-1.6.3-3.4 2-4z" />
+                                    <path class="wrist2" d="M27.1 56.2L32 45.7c.7-1.6 2.6-2.3 4.2-1.6 1.6.7 2.3 2.6 1.6 4.2L33 58.8c-.7 1.6-2.6 2.3-4.2 1.6-1.7-.7-2.4-2.6-1.7-4.2z" />
+                                </g>
+                                <g class="leg1">
+                                    <path d="M52.1 73.2s-7-5.7-7.9-6.5c-.9-.9-1.2-3.5-.1-4.9 1.1-1.4 3.8-1.9 5.2-.9l7.9 7c1.4 1.1 1.7 3.5.7 4.9-1.1 1.4-4.4 1.5-5.8.4z" />
+                                    <path class="calf1" d="M52.6 84.4l-1-12.8c-.1-1.9 1.5-3.6 3.5-3.7 2-.1 3.7 1.4 3.8 3.4l1 12.8c.1 1.9-1.5 3.6-3.5 3.7-2 0-3.7-1.5-3.8-3.4z" />
+                                </g>
+                                <g class="leg2">
+                                    <path d="M37.8 72.7s1.3-10.2 1.6-11.4 2.4-2.8 4.1-2.6c1.7.2 3.6 2.3 3.4 4l-1.8 11.1c-.2 1.7-1.7 3.3-3.4 3.1-1.8-.2-4.1-2.4-3.9-4.2z" />
+                                    <path class="calf2" d="M29.5 82.3l9.6-10.9c1.3-1.4 3.6-1.5 5.1-.1 1.5 1.4.4 4.9-.9 6.3l-8.5 9.6c-1.3 1.4-3.6 1.5-5.1.1-1.4-1.3-1.5-3.5-.2-5z" />
+                                </g>
+                            </svg>
+                            <svg class="door" viewBox="0 0 100 100">
+                                <path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z" />
+                                <circle cx="66" cy="50" r="3.7" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2903,7 +3196,7 @@
         });
 
         // ================================================================
-        // LOGOUT
+        // LOGOUT — called by animated button and admin exit
         // ================================================================
         function logout() {
             if (window.timerInterval) clearInterval(window.timerInterval);
@@ -2920,8 +3213,86 @@
             document.getElementById('loginIdInput').value = '';
             showToast('Logged out', 'info');
         }
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+
         document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+
+        // ================================================================
+        // ANIMATED LOGOUT BUTTON – integrated with logout()
+        // ================================================================
+        (function initAnimatedLogout() {
+            const btn = document.getElementById('animatedLogoutBtn');
+            if (!btn) return;
+
+            let pose = false;
+            let walkInterval = null;
+            let isPlaying = false;
+
+            function resetPose() {
+                btn.style.setProperty('--arm1', 'rotate(0deg)');
+                btn.style.setProperty('--wrist1', 'rotate(0deg)');
+                btn.style.setProperty('--arm2', 'rotate(0deg)');
+                btn.style.setProperty('--wrist2', 'rotate(0deg)');
+                btn.style.setProperty('--leg1', 'rotate(0deg)');
+                btn.style.setProperty('--calf1', 'rotate(0deg)');
+                btn.style.setProperty('--leg2', 'rotate(0deg)');
+                btn.style.setProperty('--calf2', 'rotate(0deg)');
+            }
+
+            function walkStep() {
+                pose = !pose;
+                if (pose) {
+                    btn.style.setProperty('--arm1', 'rotate(18deg)');
+                    btn.style.setProperty('--wrist1', 'rotate(-12deg)');
+                    btn.style.setProperty('--arm2', 'rotate(-18deg)');
+                    btn.style.setProperty('--wrist2', 'rotate(12deg)');
+                    btn.style.setProperty('--leg1', 'rotate(16deg)');
+                    btn.style.setProperty('--calf1', 'rotate(-10deg)');
+                    btn.style.setProperty('--leg2', 'rotate(-16deg)');
+                    btn.style.setProperty('--calf2', 'rotate(10deg)');
+                } else {
+                    btn.style.setProperty('--arm1', 'rotate(-18deg)');
+                    btn.style.setProperty('--wrist1', 'rotate(12deg)');
+                    btn.style.setProperty('--arm2', 'rotate(18deg)');
+                    btn.style.setProperty('--wrist2', 'rotate(-12deg)');
+                    btn.style.setProperty('--leg1', 'rotate(-16deg)');
+                    btn.style.setProperty('--calf1', 'rotate(10deg)');
+                    btn.style.setProperty('--leg2', 'rotate(16deg)');
+                    btn.style.setProperty('--calf2', 'rotate(-10deg)');
+                }
+            }
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isPlaying) return;
+                isPlaying = true;
+
+                btn.classList.add('walk');
+
+                walkInterval = setInterval(walkStep, 170);
+
+                setTimeout(() => {
+                    clearInterval(walkInterval);
+                    walkInterval = null;
+                    btn.classList.remove('walk');
+                    resetPose();
+                }, 900);
+
+                setTimeout(() => {
+                    btn.classList.add('fall');
+                }, 1050);
+
+                setTimeout(() => {
+                    clearInterval(walkInterval);
+                    walkInterval = null;
+                    btn.classList.remove('walk', 'fall');
+                    resetPose();
+                    pose = false;
+                    isPlaying = false;
+                    // trigger actual logout after animation
+                    logout();
+                }, 2300);
+            });
+        })();
 
         // ================================================================
         // REGISTRATION with duplicate check (email & phone)
@@ -2972,7 +3343,6 @@
                 '<span style="display:inline-block;width:1.2rem;height:1.2rem;border:2px solid rgba(255,255,255,0.1);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></span>';
 
             try {
-                // Check if email already exists
                 const { data: existingEmail, error: emailErr } = await _supabase
                     .from('Student')
                     .select('studentId')
@@ -2989,7 +3359,6 @@
                     return;
                 }
 
-                // Check if phone already exists
                 const { data: existingPhone, error: phoneErr } = await _supabase
                     .from('Student')
                     .select('studentId')
@@ -3006,7 +3375,6 @@
                     return;
                 }
 
-                // All clear — proceed with registration
                 const prefix = 'STU';
                 const random = Math.floor(100000 + Math.random() * 900000);
                 const studentId = prefix + random;
@@ -3126,7 +3494,6 @@
 
             const now = new Date();
 
-            // Check for previous session results
             let prevSession = null;
             if (window.allSessions && window.allSessions.length > 0) {
                 for (let i = window.allSessions.length - 1; i >= 0; i--) {
@@ -3169,7 +3536,6 @@
                 }
             }
 
-            // Normal current session logic
             const start = new Date(window.currentSession.startTime);
             const end = new Date(window.currentSession.endTime);
             const rankRevealTime = new Date(end.getTime() + 3 * 60000);
@@ -3229,7 +3595,6 @@
                 return;
             }
 
-            // Active Quiz
             if (now >= start && now <= end) {
                 historyWrap.classList.add('hidden');
 
@@ -3305,7 +3670,6 @@
                 return;
             }
 
-            // Ended
             if (now > end) {
                 if (now < rankRevealTime) {
                     document.getElementById('endedMsg').classList.remove('hidden');
